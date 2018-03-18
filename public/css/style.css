@@ -1,0 +1,125 @@
+main{
+  margin-top: 56px;
+}
+.result-webpage {
+  text-align: center;
+  display: block;
+}
+.result-webpage .collapsed {
+  margin-bottom: 10px;
+  transition-duration: 2s;
+}
+.result-webpage a {
+  width: 100%;
+}
+#results {
+  width:100%;
+}
+.words button, .add-word{
+  float: right;
+}
+.table-striped tbody tr:nth-of-type(odd){
+  background-color: rgba(0,0,0,.05);
+}
+.word{
+  padding: 5px;
+}
+.page-title{
+  margin-top: 25px;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+.word div button{
+  float: right;
+}
+.remove-word{
+  float: right;
+}
+#customDictWords tbody tr td h4, div table.table tbody tr td h4 {
+  display: inline-block;
+}
+body,html{
+  height:100vh;
+  /* background-color: #f6f6f6; */
+}
+#crawl {
+  margin-top: 15px;
+}
+input {
+  border-radius: 0px !important;
+}
+footer p{
+margin-right: 15px;
+color: #fff;
+}
+.h-100-tabs{
+  height: calc(100% - 83px);
+}
+#website{
+  padding:.75em;
+}
+.g5-button{
+  border-radius: 5px;
+  padding: 10px 40px;
+  font-weight: 700;
+  color: #fff;
+  border: none !important;
+  background-color: #0d2240;
+  text-transform: uppercase;
+  font-size: 24px;
+}
+/* .nav-tabs .nav-link.active{
+  background-color: #f6f6f6;
+  border-bottom-color:#f6f6f6; 
+} */
+.g5-button:hover{
+  background-color: #7897a9;
+  color: #fff;
+}
+.align-center{
+  text-align: center;
+  margin-bottom: 25px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+.center{
+  text-align: center;
+}
+.qc-check.btn{
+  margin: 10px 0px;
+  background-color: #0d2240;
+}
+.qc-check{
+  padding: 10px;
+  text-transform: uppercase;
+}
+.btn-success {
+  color: #fff;
+  background-color: #28a745 !important;
+  border-color: #28a745 !important;
+}
+.btn-danger {
+  color: #fff;
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+}
+.qc-checks .row{
+  margin-right: 0px;
+  margin-left: 0px; 
+}
+.qc-checks .row a {
+  color: #fff;
+  text-decoration: none;
+}
+.g5-button-small{
+  background-color: #0d2240;
+  border: none !important;
+}
+.g5-button-small:hover{
+  background-color: #0d2240;
+  border: none !important;
+}
+footer{ 
+  border-top: 1px solid #3d4e66;
+}

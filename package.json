@@ -1,0 +1,34 @@
+{
+  "name": "qc_spider",
+  "version": "0.0.1",
+  "description": "Spider for G5 QC",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tylrhas/g5_qc.git"
+  },
+  "author": "Tyler Hasenoehrl",
+  "bugs": {
+    "url": "https://github.com/Tylrhas/g5_qc/issues"
+  },
+  "homepage": "https://github.com/Tylrhas/g5_qc#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "ejs": "^2.5.7",
+    "eslint": "^4.19.0",
+    "express": "^4.16.3",
+    "hunspell-spellchecker": "^1.0.2",
+    "jslint": "^0.12.0",
+    "pg": "^7.4.1",
+    "puppeteer": "^1.2.0",
+    "sequelize": "^4.37.1"
+  },
+  "devDependencies": {
+    "@types/puppeteer": "^1.2.0",
+    "dotenv": "^5.0.1"
+  }
+}

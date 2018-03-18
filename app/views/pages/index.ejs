@@ -1,0 +1,29 @@
+<% include ../partials/header.ejs %>
+    <% include ../partials/nav.ejs %>
+        <div class="tab-content h-100-tabs" id="myTabContent">
+            <div class=" h-100 tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="crawl-tab">
+                <div class="container h-100">
+                    <div class="row h-100 justify-content-center align-items-center">
+                        <div class="col-md-6">
+                            <h2 class="align-center"> G5 Quality Control</h2>
+                            <input type="url" id="website" class="form-control" placeholder="Home Page URL" required autofocus>
+                            <button id="crawl" class="btn btn-lg btn-primary btn-block g5-button">Crawl</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="customDict" role="tabpanel" aria-labelledby="dict-tab">
+                <div class="container">
+                    <h2 class="page-title">Custom Dictionary</h2>
+                    <table class="table table-bordered table-striped" id="customDictWords">
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="results" role="tabpanel" aria-labelledby="results-tab">
+                <div class="container" id="results">
+                    <h2 class="page-title">Crawl Results</h2>
+                </div>
+            </div>
+        </div>
+<% include ../partials/footer.ejs %>
