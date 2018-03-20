@@ -4,7 +4,7 @@ var spell = require('./spell.js')
 const models = require('../models')
 var dictionary = require('../controllers/custom-dictionary.js')
 
-async function crawl (socket) {
+async function crawl (io) {
   var job = await getNext()
   console.log(job)
   await job[0].update({ processing: true })
@@ -88,17 +88,19 @@ async function crawl (socket) {
   }
   console.log('closing')
   browser.close()
-  socket.emit('qcDone', crawlResults)
+  // add job id 
+  crawlResults.jobID = job.id
+  io.emit('qcDone', crawlResults)
   await job[0].destroy()
   var jobQueue = await models.jobQueue.count()
   if (jobQueue > 0) {
-    return crawl(socket)
+    return crawl(io)
   }
   // res.json(crawlResults)
 }
 async function getLinks(page, urls, url) {
   // scrape all ancors on the page
-  var anchors = await page.$$eval('a', links => {
+  var anchors = await page.$$eval('a', links => { 
     let all_anchors = links.map((link) => link.href)
     return all_anchors
   })

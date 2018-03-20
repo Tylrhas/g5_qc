@@ -73,7 +73,7 @@ io.on('connection', function (socket) {
       jobQueue.then(function (jobQueue) {
         if (!jobQueue) {
           console.log('here we go!')
-          crawl.crawl(socket)
+          crawl.crawl(io)
         }
       })
     })
