@@ -88,7 +88,7 @@ async function crawl (io) {
   }
   console.log('closing')
   browser.close()
-  // add job id 
+  // add job id
   crawlResults.jobID = job.id
   io.emit('qcDone', crawlResults)
   await job[0].destroy()
@@ -98,27 +98,27 @@ async function crawl (io) {
   }
   // res.json(crawlResults)
 }
-async function getLinks(page, urls, url) {
+async function getLinks (page, urls, url) {
   // scrape all ancors on the page
-  var anchors = await page.$$eval('a', links => { 
-    let all_anchors = links.map((link) => link.href)
-    return all_anchors
+  var anchors = await page.$$eval('a', links => {
+    let allAnchors = links.map((link) => link.href)
+    return allAnchors
   })
 
   // add the ancors to the existing urls array
-  var all_anchors = urls.concat(anchors)
+  var allAnchors = urls.concat(anchors)
 
   // remove duplicates, urls of a different domains and phone numbers
-  let unique_array = []
-  for (let i = 0; i < all_anchors.length; i++) {
-    if (unique_array.indexOf(all_anchors[i]) == -1 && !all_anchors[i].indexOf(url)) {
-      unique_array.push(all_anchors[i])
+  let uniqueArray = []
+  for (let i = 0; i < allAnchors.length; i++) {
+    if (uniqueArray.indexOf(allAnchors[i]) == -1 && !allAnchors[i].indexOf(url)) {
+      uniqueArray.push(allAnchors[i])
     }
   }
-  return unique_array
+  return uniqueArray
 }
 
-function getNext() {
+function getNext () {
   return models.jobQueue.findAll({ limit: 1 })
 }
 
