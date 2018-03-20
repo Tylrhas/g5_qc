@@ -12,9 +12,9 @@ var CustomDictionary = {
     })
   },
   remove: function (removeWord) {
-   return db.custom_dict.destroy({where: {word: removeWord}}).then(dictionary => {
-     return dictionary
-   })
+    return db.custom_dict.destroy({where: {word: removeWord}}).then(dictionary => {
+      return dictionary
+    })
   },
   add: function (addWord) {
     return db.custom_dict.upsert({ word: addWord }).then(dictionary => {

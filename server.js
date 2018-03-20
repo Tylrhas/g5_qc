@@ -1,5 +1,10 @@
+// Express
 var express = require('express')
 var app = express()
+// Socket IO
+var server = require('http').Server(app)
+var io = require('socket.io')(server)
+
 var bodyParser = require('body-parser')
 var crawl = require('./app/controllers/crawl.js')
 var dictionary = require('./app/controllers/custom-dictionary.js')
@@ -9,7 +14,7 @@ app.set('views', './app/views')
 app.set('view engine', 'ejs')
 
 // app.use(favicon(path.join(__dirname, 'public', 'favicon.png')))
-app.set('port', (process.env.PORT || 5000))
+var port = process.env.PORT || 5000
 app.use(express.static(__dirname + '/public'))
 
 // For BodyParser
@@ -53,8 +58,13 @@ app.post('/dictionary/remove', function (req, res) {
   })
 })
 
-app.listen(app.get('port'), function () {
-  console.log('QC App is running on port', app.get('port'))
+server.listen(port)
+
+io.on('connection', function (socket) {
+  socket.emit('news', { hello: 'world' })
+  socket.on('my other event', function (data) {
+    console.log(data)
+  })
 })
 
 // Sync Database
