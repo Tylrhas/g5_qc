@@ -1,7 +1,15 @@
 const puppeteer = require('puppeteer')
 var spell = require('./spell.js')
 
-async function crawl (url, dictionary, socket) {
+const models = require('../models')
+var dictionary = require('../controllers/custom-dictionary.js')
+
+async function crawl (socket) {
+  var job = await getNext()
+  console.log(job)
+  await job[0].update({ processing: true })
+  var words = await dictionary.load()
+  var url = job.url
   // initilize the browser
   const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] })
   const page = await browser.newPage()
@@ -37,7 +45,7 @@ async function crawl (url, dictionary, socket) {
     crawlResults.crawled[url] = {}
 
     // spellcheck the copy
-    crawlResults.crawled[url].copy = spell.check(copy, dictionary)
+    crawlResults.crawled[url].copy = spell.check(copy, words)
 
     crawlResults.crawled[url].lazyLoad = lazyLoad
   } catch (error) {
@@ -64,7 +72,7 @@ async function crawl (url, dictionary, socket) {
       crawlResults.crawled[urls[l]] = {}
 
       // check the spelling on the site
-      crawlResults.crawled[urls[l]].copy = spell.check(copy, dictionary)
+      crawlResults.crawled[urls[l]].copy = spell.check(copy, words)
       crawlResults.crawled[urls[l]].lazyLoad = lazyLoad
 
       // get links on the page
@@ -81,9 +89,14 @@ async function crawl (url, dictionary, socket) {
   console.log('closing')
   browser.close()
   socket.emit('qcDone', crawlResults)
+  await job[0].destroy()
+  var jobQueue = await models.jobQueue.count()
+  if (jobQueue > 0) {
+    return crawl(socket)
+  }
   // res.json(crawlResults)
 }
-async function getLinks (page, urls, url) {
+async function getLinks(page, urls, url) {
   // scrape all ancors on the page
   var anchors = await page.$$eval('a', links => {
     let all_anchors = links.map((link) => link.href)
@@ -101,6 +114,10 @@ async function getLinks (page, urls, url) {
     }
   }
   return unique_array
+}
+
+function getNext() {
+  return models.jobQueue.findAll({ limit: 1 })
 }
 
 // for lazy-load look for images with the class "lazy-load"

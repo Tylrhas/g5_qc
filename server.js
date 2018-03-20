@@ -62,10 +62,20 @@ server.listen(port)
 
 io.on('connection', function (socket) {
   socket.emit('news', { hello: 'world' })
-  socket.on('crawl', function (url) {
-    var words = dictionary.load()
-    words.then(function (words) {
-      crawl.crawl(url.url, words, socket)
+  socket.on('crawl', function (data) {
+    enqueue(data.url).then(job => {
+      socket.emit('enqueued', job.dataValues)
+      var jobQueue = models.jobQueue.findOne({
+        where: {
+          processing: true
+        }
+      })
+      jobQueue.then(function (jobQueue) {
+        if (!jobQueue) {
+          console.log('here we go!')
+          crawl.crawl(socket)
+        }
+      })
     })
   })
 })
@@ -77,3 +87,6 @@ models.sequelize.sync().then(function () {
 }).catch(function (err) {
   console.log(err, 'Something went wrong with the Database Update!')
 })
+function enqueue (url) {
+  return models.jobQueue.create({url})
+}
