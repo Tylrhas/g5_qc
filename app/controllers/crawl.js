@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer')
 var spell = require('./spell.js')
 
-async function crawl (url, req, res, dictionary) {
+async function crawl (url, dictionary, socket) {
   // initilize the browser
   const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] })
   const page = await browser.newPage()
@@ -80,7 +80,8 @@ async function crawl (url, req, res, dictionary) {
   }
   console.log('closing')
   browser.close()
-  res.json(crawlResults)
+  socket.emit('qcDone', crawlResults)
+  // res.json(crawlResults)
 }
 async function getLinks (page, urls, url) {
   // scrape all ancors on the page

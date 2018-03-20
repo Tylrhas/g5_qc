@@ -62,8 +62,11 @@ server.listen(port)
 
 io.on('connection', function (socket) {
   socket.emit('news', { hello: 'world' })
-  socket.on('my other event', function (data) {
-    console.log(data)
+  socket.on('crawl', function (url) {
+    var words = dictionary.load()
+    words.then(function (words) {
+      crawl.crawl(url.url, words, socket)
+    })
   })
 })
 
