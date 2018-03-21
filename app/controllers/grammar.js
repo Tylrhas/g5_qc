@@ -1,5 +1,5 @@
 const rousseau = require('rousseau')
-
+// turn off passive voice and readability
 function check (copy) {
   var grammar = []
 
