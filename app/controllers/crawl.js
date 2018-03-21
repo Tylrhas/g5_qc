@@ -55,37 +55,39 @@ async function crawl (io) {
   var l = 0
   while (crawled.length < urls.length) {
     console.log(urls[l])
+    if (!urls[l].indexOf('/#')) {
     // go to the new page
-    try {
-      await page.goto(urls[l])
+      try {
+        await page.goto(urls[l])
 
-      // get all images with lazyload enabled
-      lazyLoad = await page.$$eval('img.lazy-load', images => {
-        return images.map((img) => img.getAttribute('data-src'))
-      })
+        // get all images with lazyload enabled
+        lazyLoad = await page.$$eval('img.lazy-load', images => {
+          return images.map((img) => img.getAttribute('data-src'))
+        })
 
-      // scrape the copy on the site
-      copy = await page.$$eval('.html-content p , h1, h2, h3, h4, h5, h6, .html-content li ', paragraphs => {
-        return paragraphs.map((paragraph) => paragraph.textContent)
-      })
+        // scrape the copy on the site
+        copy = await page.$$eval('.html-content p , h1, h2, h3, h4, h5, h6, .html-content li ', paragraphs => {
+          return paragraphs.map((paragraph) => paragraph.textContent)
+        })
 
-      // set the url key to an empty object
-      crawlResults.crawled[urls[l]] = {}
+        // set the url key to an empty object
+        crawlResults.crawled[urls[l]] = {}
 
-      // check the spelling on the site
-      crawlResults.crawled[urls[l]].copy = spell.check(copy, words)
-      crawlResults.crawled[urls[l]].lazyLoad = lazyLoad
+        // check the spelling on the site
+        crawlResults.crawled[urls[l]].copy = spell.check(copy, words)
+        crawlResults.crawled[urls[l]].lazyLoad = lazyLoad
 
-      // get links on the page
-      urls = await getLinks(page, urls, url)
-    } catch (error) {
+        // get links on the page
+        urls = await getLinks(page, urls, url)
+      } catch (error) {
       // add this page to error'd pages
-      crawlResults.error.push(urls[l])
+        crawlResults.error.push(urls[l])
+      }
+      // push the urls to the crawled array
+      crawled.push(urls[l])
+      // increase the url
+      l++
     }
-    // push the urls to the crawled array
-    crawled.push(urls[l])
-    // increase the url
-    l++
   }
   console.log('closing')
   browser.close()
@@ -103,6 +105,7 @@ async function getLinks (page, urls, url) {
   // scrape all ancors on the page
   var anchors = await page.$$eval('a', links => {
     let allAnchors = links.map((link) => link.href)
+
     return allAnchors
   })
 
