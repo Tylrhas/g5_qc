@@ -99,7 +99,7 @@ async function crawl (io) {
   }
   // res.json(crawlResults)
 }
-async function getLinks(page, urls, url) {
+async function getLinks (page, urls, url) {
   // scrape all ancors on the page
   var anchors = await page.$$eval('a', links => {
     let allAnchors = links.map((link) => link.href)
@@ -119,7 +119,7 @@ async function getLinks(page, urls, url) {
   return uniqueArray
 }
 
-function getNext() {
+function getNext () {
   return models.jobQueue.findAll({ limit: 1 })
 }
 
