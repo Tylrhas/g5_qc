@@ -9,7 +9,7 @@ async function crawl (io) {
   console.log(job)
   await job[0].update({ processing: true })
   var words = await dictionary.load()
-  var url = job.url
+  var url = job[0].url
   // initilize the browser
   const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] })
   const page = await browser.newPage()
@@ -89,7 +89,7 @@ async function crawl (io) {
   console.log('closing')
   browser.close()
   // add job id
-  crawlResults.jobID = job.id
+  crawlResults.jobID = job[0].id
   io.emit('qcDone', crawlResults)
   await job[0].destroy()
   var jobQueue = await models.jobQueue.count()
@@ -98,7 +98,7 @@ async function crawl (io) {
   }
   // res.json(crawlResults)
 }
-async function getLinks (page, urls, url) {
+async function getLinks(page, urls, url) {
   // scrape all ancors on the page
   var anchors = await page.$$eval('a', links => {
     let allAnchors = links.map((link) => link.href)
@@ -118,7 +118,7 @@ async function getLinks (page, urls, url) {
   return uniqueArray
 }
 
-function getNext () {
+function getNext() {
   return models.jobQueue.findAll({ limit: 1 })
 }
 
