@@ -1,15 +1,18 @@
 module.exports = function (sequelize, Sequelize) {
-  var custom_dict = sequelize.define('custom_dict', {
+  var jobQueue = sequelize.define('jobQueue', {
 
     id: {
       autoIncrement: true,
       primaryKey: true,
       type: Sequelize.INTEGER
     },
-    word: {
+    url: {
       type: Sequelize.TEXT,
-      allowNull: false,
-      unique: true
+      allowNull: false
+    },
+    processing: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false
     }
   },
   {
@@ -17,5 +20,5 @@ module.exports = function (sequelize, Sequelize) {
     freezeTableName: true
   })
 
-  return custom_dict
+  return jobQueue
 }
