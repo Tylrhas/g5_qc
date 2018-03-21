@@ -4,7 +4,7 @@ var spell = require('./spell.js')
 const models = require('../models')
 var dictionary = require('../controllers/custom-dictionary.js')
 
-async function crawl (io) {
+async function crawl(io) {
   // set empty results object for spell check results
   var crawlResults = {
     crawled: {},
@@ -25,7 +25,7 @@ async function crawl (io) {
   page.on('error', (error) => {
     console.log('Page Error:', error)
   })
-  io.emit('jobStart', {jobID: job[0].id})
+  io.emit('jobStart', { jobID: job[0].id })
   try {
     // load the page
     await page.goto(url)
@@ -49,14 +49,16 @@ async function crawl (io) {
     crawlResults.crawled[url].copy = spell.check(copy, words)
 
     crawlResults.crawled[url].lazyLoad = lazyLoad
+    crawled.push(url)
   } catch (error) {
     crawlResults.error.push(url)
   }
   var l = 0
   while (crawled.length < urls.length) {
-    console.log(urls[l])
-    if (!urls[l].indexOf('/#')) {
-    // go to the new page
+    // do not crawl any urls with /# in them
+    if (urls[l].indexOf('/#') === -1) {
+      console.log(urls[l])
+      // go to the new page
       try {
         await page.goto(urls[l])
 
@@ -80,14 +82,14 @@ async function crawl (io) {
         // get links on the page
         urls = await getLinks(page, urls, url)
       } catch (error) {
-      // add this page to error'd pages
+        // add this page to error'd pages
         crawlResults.error.push(urls[l])
       }
-      // push the urls to the crawled array
-      crawled.push(urls[l])
       // increase the url
-      l++
     }
+    // push the urls to the crawled array
+    crawled.push(urls[l])
+    l++
   }
   console.log('closing')
   browser.close()
@@ -101,7 +103,7 @@ async function crawl (io) {
   }
   // res.json(crawlResults)
 }
-async function getLinks (page, urls, url) {
+async function getLinks(page, urls, url) {
   // scrape all ancors on the page
   var anchors = await page.$$eval('a', links => {
     let allAnchors = links.map((link) => link.href)
@@ -122,7 +124,7 @@ async function getLinks (page, urls, url) {
   return uniqueArray
 }
 
-function getNext () {
+function getNext() {
   return models.jobQueue.findAll({ limit: 1 })
 }
 
