@@ -1,6 +1,5 @@
 var jobid
 $('#crawl').click(function () {
-  $(this).html('Crawling')
   var url = $('#website').val()
   socket.emit('crawl', { url: url })
 })
@@ -8,6 +7,7 @@ $('#crawl').click(function () {
 socket.on('enqueued', function (data) {
   jobid = data.id
   console.log(jobid)
+  $('#crawl').html('Job Enqueued')
 })
 socket.on('qcDone', function (data) {
   // check if completed job is the correct job
@@ -16,8 +16,16 @@ socket.on('qcDone', function (data) {
     renderResults(data)
   }
 })
+socket.on('jobStart', function (data) {
+  console.log(data.jobID)
+  console.log(jobid)
+  // check if completed job is the correct job
+  if (jobid === data.jobID) {
+    $('#crawl').html('Job Running')
+  }
+})
 
-function renderResults(data) {
+function renderResults (data) {
   // enable the results tab
   $('#results-tab').removeClass('disabled')
   renderSpelling(data)
@@ -25,7 +33,7 @@ function renderResults(data) {
   $('#crawl').html('Done')
 }
 
-function renderLazyLoad(data) {
+function renderLazyLoad (data) {
   for (let i = 0; i < Object.keys(data.crawled).length; i++) {
     let webPage = Object.keys(data.crawled)[i]
     let lazyLoad = data.crawled[webPage].lazyLoad
@@ -48,7 +56,7 @@ function renderLazyLoad(data) {
   }
 }
 
-function renderSpelling(data) {
+function renderSpelling (data) {
   for (let i = 0; i < Object.keys(data.crawled).length; i++) {
     var webPage = Object.keys(data.crawled)[i]
     var mispelledWords = data.crawled[webPage].copy
@@ -83,16 +91,16 @@ function renderSpelling(data) {
   })
 }
 
-function createWebButton(i, webPage) {
+function createWebButton (i, webPage) {
   var anchor = '<div class="container result-webpage"><a class="btn btn-primary collapsed g5-button-small" data-toggle="collapse" href="#webpage' + i + '" role="button" aria-expanded="false" aria-controls="collapseExample"><div class="row"><div class="container">' + webPage + '</div></div></a></div>'
   $('#results').append(anchor)
   createQC(i)
 }
-function createQC(i) {
+function createQC (i) {
   var qcCheck = '<div class="qc-checks container collapse" id="webpage' + i + '"><div class="row"><a class="col-4 center qc-check btn" id="spelling-' + i + '" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseExample" href="#spelling-words-' + i + '">Spelling</a><a class="col-4 center qc-check btn" id="grammar-' + i + '">Grammar</a><a class="col-4 center qc-check btn" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="lazy-load-' + i + '" id="lazy-' + i + '" href="#lazy-load-' + i + '">Lazy Load</a></div></div>'
   $('#results').append(qcCheck)
 }
-function createWord(i, i2, word) {
+function createWord (i, i2, word) {
   if (i2 === 0) {
     $('#webpage' + i).append('<div class="row collapse" id="spelling-words-' + i + '"><table class="table table-bordered table-striped"><tbody id="spelling-table-' + i + '"></tbody></table></div>')
   }

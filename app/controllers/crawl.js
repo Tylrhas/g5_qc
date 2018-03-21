@@ -5,6 +5,14 @@ const models = require('../models')
 var dictionary = require('../controllers/custom-dictionary.js')
 
 async function crawl (io) {
+  // set empty results object for spell check results
+  var crawlResults = {
+    crawled: {},
+    error: []
+  }
+  var crawled = []
+  var urls = []
+
   var job = await getNext()
   console.log(job)
   await job[0].update({ processing: true })
@@ -17,14 +25,7 @@ async function crawl (io) {
   page.on('error', (error) => {
     console.log('Page Error:', error)
   })
-
-  // set empty results object for spell check results
-  var crawlResults = {
-    crawled: {},
-    error: []
-  }
-  var crawled = []
-  var urls = []
+  io.emit('jobStart', {jobID: job[0].id})
   try {
     // load the page
     await page.goto(url)
