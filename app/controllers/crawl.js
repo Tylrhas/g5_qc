@@ -1,10 +1,10 @@
 const puppeteer = require('puppeteer')
 var spell = require('./spell.js')
-
+const grammar = require('./grammar.js')
 const models = require('../models')
 var dictionary = require('../controllers/custom-dictionary.js')
 
-async function crawl(io) {
+async function crawl (io) {
   // set empty results object for spell check results
   var crawlResults = {
     crawled: {},
@@ -48,6 +48,9 @@ async function crawl(io) {
     // spellcheck the copy
     crawlResults.crawled[url].copy = spell.check(copy, words)
 
+    // grammar Check the Copy
+    crawlResults.crawled[url].grammar = grammar.check(copy)
+
     crawlResults.crawled[url].lazyLoad = lazyLoad
     crawled.push(url)
   } catch (error) {
@@ -77,7 +80,11 @@ async function crawl(io) {
 
         // check the spelling on the site
         crawlResults.crawled[urls[l]].copy = spell.check(copy, words)
+
         crawlResults.crawled[urls[l]].lazyLoad = lazyLoad
+
+        // grammar Check the Copy
+        crawlResults.crawled[urls[l]].grammar = grammar.check(copy)
 
         // get links on the page
         urls = await getLinks(page, urls, url)
@@ -103,7 +110,7 @@ async function crawl(io) {
   }
   // res.json(crawlResults)
 }
-async function getLinks(page, urls, url) {
+async function getLinks (page, urls, url) {
   // scrape all ancors on the page
   var anchors = await page.$$eval('a', links => {
     let allAnchors = links.map((link) => link.href)
@@ -124,7 +131,7 @@ async function getLinks(page, urls, url) {
   return uniqueArray
 }
 
-function getNext() {
+function getNext () {
   return models.jobQueue.findAll({ limit: 1 })
 }
 
