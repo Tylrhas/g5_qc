@@ -25,6 +25,7 @@
     "jslint": "^0.12.0",
     "pg": "^7.4.1",
     "puppeteer": "^1.2.0",
+    "rousseau": "^1.0.5",
     "sequelize": "^4.37.1",
     "socket.io": "^2.0.4"
   },
