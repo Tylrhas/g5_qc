@@ -30,6 +30,7 @@ function renderResults (data) {
   $('#results-tab').removeClass('disabled')
   renderSpelling(data)
   renderLazyLoad(data)
+  renderGrammar(data)
   $('#crawl').html('Done')
 }
 
@@ -97,7 +98,7 @@ function createWebButton (i, webPage) {
   createQC(i)
 }
 function createQC (i) {
-  var qcCheck = '<div class="qc-checks container collapse" id="webpage' + i + '"><div class="row"><a class="col-4 center qc-check btn" id="spelling-' + i + '" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseExample" href="#spelling-words-' + i + '">Spelling</a><a class="col-4 center qc-check btn" id="grammar-' + i + '">Grammar</a><a class="col-4 center qc-check btn" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="lazy-load-' + i + '" id="lazy-' + i + '" href="#lazy-load-' + i + '">Lazy Load</a></div></div>'
+  var qcCheck = '<div class="qc-checks container collapse" id="webpage' + i + '"><div class="row"><a class="col-4 center qc-check btn" id="spelling-' + i + '" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseExample" href="#spelling-words-' + i + '">Spelling</a><a class="col-4 center qc-check btn" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="grammar-check-' + i + '" href="#grammar-check-' + i + '" id="grammar-' + i + '" >Grammar</a><a class="col-4 center qc-check btn" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="lazy-load-' + i + '" id="lazy-' + i + '" href="#lazy-load-' + i + '">Lazy Load</a></div></div>'
   $('#results').append(qcCheck)
 }
 function createWord (i, i2, word) {
@@ -106,4 +107,28 @@ function createWord (i, i2, word) {
   }
   var htmlWord = '<tr><td><h4>' + word + '</h4><button word="' + word + '" class="add-word btn btn-success">Add Word</button></td></tr>'
   $('#spelling-table-' + i).append(htmlWord)
+}
+
+function renderGrammar (data) {
+  for (let i = 0; i < Object.keys(data.crawled).length; i++) {
+    let webPage = Object.keys(data.crawled)[i]
+    let grammar = data.crawled[webPage].grammar
+    let target = '#grammar-' + i
+    if (grammar.length === 0) {
+      $(target).addClass('btn-success')
+    } else {
+      // create the Images table
+      $(target).addClass('btn-danger')
+      for (let i2 = 0; i2 < grammar.length; i2++) {
+        if (i2 === 0) {
+          // it is the first image load in the table HTML
+          $('#webpage' + i).append('<div class="row collapse" id="grammar-check-' + i + '"><table class="table table-bordered table-striped"><tbody id="grammar-table-' + i + '"></tbody></table></div>')
+        }
+        let message = grammar[i2].message
+        let value = grammar[i2].value
+        let grammarHTML = '<tr><td>' + value + ' : ' + message + '</td></tr>'
+        document.getElementById('grammar-table-' + i).insertAdjacentHTML('beforeend', grammarHTML)
+      }
+    }
+  }
 }
