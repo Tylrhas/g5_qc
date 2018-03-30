@@ -32,6 +32,7 @@ function renderResults (data) {
   renderLazyLoad(data)
   renderGrammar(data)
   $('#crawl').html('Done')
+  $('#results-tab').click()
 }
 
 function renderLazyLoad (data) {
@@ -93,12 +94,12 @@ function renderSpelling (data) {
 }
 
 function createWebButton (i, webPage) {
-  var anchor = '<div class="container result-webpage"><a class="btn btn-primary collapsed g5-button-small" data-toggle="collapse" href="#webpage' + i + '" role="button" aria-expanded="false" aria-controls="collapseExample"><div class="row"><div class="container">' + webPage + '</div></div></a></div>'
+  var anchor = '<div class="container result-webpage"><a class="btn btn-primary g5-button-small" data-toggle="collapse" href="#webpage' + i + '" role="button" aria-expanded="false" aria-controls="collapseExample"><div class="row"><div class="container">' + webPage + '</div></div></a></div>'
   $('#results').append(anchor)
   createQC(i)
 }
 function createQC (i) {
-  var qcCheck = '<div class="qc-checks container collapse" id="webpage' + i + '"><div class="row"><a class="col-4 center qc-check btn" id="spelling-' + i + '" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseExample" href="#spelling-words-' + i + '">Spelling</a><a class="col-4 center qc-check btn" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="grammar-check-' + i + '" href="#grammar-check-' + i + '" id="grammar-' + i + '" >Grammar</a><a class="col-4 center qc-check btn" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="lazy-load-' + i + '" id="lazy-' + i + '" href="#lazy-load-' + i + '">Lazy Load</a></div></div>'
+  var qcCheck = '<div class="qc-checks container collapse show" id="webpage' + i + '"><div class="row"><a class="col-4 center qc-check btn" id="spelling-' + i + '" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseExample" href="#spelling-words-' + i + '">Spelling</a><a class="col-4 center qc-check btn" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="grammar-check-' + i + '" href="#grammar-check-' + i + '" id="grammar-' + i + '" >Grammar</a><a class="col-4 center qc-check btn" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="lazy-load-' + i + '" id="lazy-' + i + '" href="#lazy-load-' + i + '">Lazy Load</a></div></div>'
   $('#results').append(qcCheck)
 }
 function createWord (i, i2, word) {
