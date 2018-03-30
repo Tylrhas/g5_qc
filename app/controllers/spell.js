@@ -11,30 +11,32 @@ spellchecker.use(DICT)
 
 function spellCheck (copy, dictionary) {
   var mispelled = []
-
-  // remove numbers
-  copy = copy.replace(/\d/g, '')
   // break array into groups of copy
   for (let i = 0; i < copy.length; i++) {
     // break the groups of copy up into words for the spellchecker
     var words = String(copy[i]).split(/(\s+)/).filter(function (e) { return e.trim().length > 0 })
 
     for (let i2 = 0; i2 < words.length; i2++) {
-      // strip off punctuation from words if it exists
       var word = words[i2]
-      word = word.replace(',', '')
-      word = word.replace('.', '')
-      word = word.replace(';', '')
-      word = word.replace(':', '')
-      word = word.replace('!', '')
-      word = word.replace('?', '')
-      word = word.replace('*', '')
-      word = word.replace('(', '')
-      word = word.replace(')', '')
+      var regexNum = /\d/g
+      // make sure the string does not contain a number
+      if (!regexNum.test(word)) {
+        // check if string contains number
+        // strip off punctuation from words if it exists
+        word = word.replace(',', '')
+        word = word.replace('.', '')
+        word = word.replace(';', '')
+        word = word.replace(':', '')
+        word = word.replace('!', '')
+        word = word.replace('?', '')
+        word = word.replace('*', '')
+        word = word.replace('(', '')
+        word = word.replace(')', '')
 
-      if (checkSpelling(word, dictionary)) {
-        // word is mispelled
-        mispelled.push(word)
+        if (checkSpelling(word, dictionary)) {
+          // word is mispelled
+          mispelled.push(word)
+        }
       }
     }
   }
