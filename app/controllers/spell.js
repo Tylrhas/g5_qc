@@ -12,6 +12,8 @@ spellchecker.use(DICT)
 function spellCheck (copy, dictionary) {
   var mispelled = []
 
+  // remove numbers
+  copy = copy.replace(/\d/g, '')
   // break array into groups of copy
   for (let i = 0; i < copy.length; i++) {
     // break the groups of copy up into words for the spellchecker
@@ -27,6 +29,8 @@ function spellCheck (copy, dictionary) {
       word = word.replace('!', '')
       word = word.replace('?', '')
       word = word.replace('*', '')
+      word = word.replace('(', '')
+      word = word.replace(')', '')
 
       if (checkSpelling(word, dictionary)) {
         // word is mispelled
