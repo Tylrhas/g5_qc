@@ -1,7 +1,12 @@
 var jobid
+
 $('#crawl').click(function () {
   var url = $('#website').val()
   socket.emit('crawl', { url: url })
+  $('#results .container').remove()
+  var html = '<div id="results-container" class="container"><h2 class="page-title">Crawl Results</h2> <div class="row container"><a href="#" class="btn btn-primary g5-button-small" id="expand_all" data-toggle="collapse" data-target=".qc-checks" aria-expanded="false">Expand / Collapse All</a></div></div>'
+  $('#results').append(html)
+  $('#results-tab').addClass('disabled')
 })
 
 socket.on('enqueued', function (data) {
@@ -33,6 +38,22 @@ function renderResults (data) {
   renderGrammar(data)
   $('#crawl').html('Done')
   $('#results-tab').click()
+
+  // $('#expand_all').click(function () {
+  //   console.log('clicked')
+  //   $('.qc-checks').collapse('toggle')
+  // })
+
+  $('#expand_all').click(function () {
+    if ($(this).hasClass('active')) {
+      $('.qc-checks').removeClass('show')
+    }
+    else {
+      $('.qc-checks').addClass('show')
+    }
+    $(this).toggleClass('active')
+  })
+  $('#crawl').html('crawl')
 }
 
 function renderLazyLoad (data) {

@@ -113,13 +113,16 @@ color: #fff;
   text-decoration: none;
 }
 .g5-button-small{
-  background-color: #0d2240;
+  background-color: #0d2240 !important;
   border: none !important;
 }
 .g5-button-small:hover{
-  background-color: #0d2240;
+  background-color: #0d2240 !important;
   border: none !important;
 }
 footer{ 
   border-top: 1px solid #3d4e66;
+}
+#results .g5-button-small {
+  margin-bottom: 10px;
 }
