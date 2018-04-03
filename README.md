@@ -6,4 +6,6 @@ It Checks the following:
   - Grammar
   - Last Publish Date of the website (To-Do)
   - Check for double Spaces (To-Do)
-  - Check for &nbsp; (To-Do)
+  - Check for '&nbsp;' (To-Do)
+  - Check for Hub Thumbs (To-Do)
+  - Check for Images without alt (To-Do)
