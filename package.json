@@ -23,6 +23,8 @@
     "express": "^4.16.3",
     "hunspell-spellchecker": "^1.0.2",
     "jslint": "^0.12.0",
+    "passport": "^0.4.0",
+    "passport-oauth2": "^1.4.0",
     "pg": "^7.4.1",
     "puppeteer": "^1.2.0",
     "rousseau": "^1.0.5",
