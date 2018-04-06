@@ -24,7 +24,10 @@ module.exports = function (passport, user) {
     callbackURL: process.env.G5_AUTH_REDIRECT_URI
   },
   function (accessToken, refreshToken, profile, cb) {
-    User.findOrCreate({ id: profile.id }, function (err, user) {
+    console.log(profile)
+    console.log(accessToken)
+    console.log(refreshToken)
+    User.findOrCreate({where: {id: profile.id}, defaults: {token: accessToken}}, function (err, user) {
       return cb(err, user)
     })
   }

@@ -10,7 +10,7 @@ var passport = require('passport')
 var session = require('express-session')
 // For Passport
 app.use(session({
-  secret: process.env.session_secret,
+  secret: process.env.G5_AUTH_CLIENT_SECRET,
   resave: true,
   saveUninitialized: true
 }))
@@ -32,7 +32,7 @@ app.set('views', './app/views')
 app.set('view engine', 'ejs')
 
 // app.use(favicon(path.join(__dirname, 'public', 'favicon.png')))
-var port = process.env.PORT || 5000
+var port = process.env.PORT || 3000
 app.use(express.static(__dirname + '/public'))
 
 // For BodyParser
@@ -41,9 +41,20 @@ app.use(bodyParser.urlencoded({
 }))
 app.use(bodyParser.json())
 
-app.get('/', function (req, res) {
-  res.render('pages/index', { user: req.user })
-})
+app.get('/g5_auth/users/auth/g5/callback',
+  passport.authenticate('oauth2', { failureRedirect: '/login' }),
+  function (req, res) {
+    // Successful authentication, redirect home.
+    res.redirect('/woot')
+  })
+
+app.get('/',
+  passport.authenticate('oauth2', { failureRedirect: '/login' }),
+  function (req, res) {
+    res.render('pages/index', { user: req.user })
+    // Successful authentication, redirect home.
+    res.redirect('/woot')
+  })
 
 app.post('/crawl', function (req, res) {
   // load up the Custom Dictionary
@@ -105,6 +116,6 @@ models.sequelize.sync().then(function () {
 }).catch(function (err) {
   console.log(err, 'Something went wrong with the Database Update!')
 })
-function enqueue (url) {
-  return models.jobQueue.create({url})
+function enqueue(url) {
+  return models.jobQueue.create({ url })
 }
