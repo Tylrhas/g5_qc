@@ -24,10 +24,12 @@ module.exports = function (passport, user) {
     callbackURL: process.env.G5_AUTH_REDIRECT_URI
   },
   function (accessToken, refreshToken, profile, cb) {
+    //use access token for bearer token to v1/me to get the users info then create the user in the database
     console.log(profile)
     console.log(accessToken)
     console.log(refreshToken)
-    User.findOrCreate({where: {id: profile.id}, defaults: {token: accessToken}}, function (err, user) {
+    User.findOrCreate({where: {id: profile.id}, defaults: {token: accessToken, email: 'testing123'}}).then(function (err, user) {
+      console.log(user)
       return cb(err, user)
     })
   }

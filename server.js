@@ -8,9 +8,9 @@ var models = require('./app/models')
 // Passport
 var passport = require('passport')
 var session = require('express-session')
-// For Passport
+
 app.use(session({
-  secret: process.env.G5_AUTH_CLIENT_SECRET,
+  secret: process.env.SESSION_SECRET,
   resave: true,
   saveUninitialized: true
 }))

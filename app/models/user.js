@@ -1,5 +1,4 @@
 module.exports = function (sequelize, Sequelize) {
-
   var User = sequelize.define('user', {
 
     id: {
@@ -9,18 +8,18 @@ module.exports = function (sequelize, Sequelize) {
     },
 
     token: {
-      type: Sequelize.STRING,
-      notEmpty: true
+      type: Sequelize.STRING
+      // notEmpty: true
     },
 
     name: {
-      type: Sequelize.STRING,
-      notEmpty: true
+      type: Sequelize.STRING
+      // notEmpty: true
     },
 
     email: {
-      type: Sequelize.STRING,
-      notEmpty: true
+      type: Sequelize.STRING
+      // notEmpty: true
     }
 
   })
