@@ -1,6 +1,7 @@
 module.exports = function (passport, user) {
   var User = user
   var OAuth2Strategy = require('passport-oauth2')
+  var request = require('request')
 
   passport.serializeUser(function (user, done) {
     // placeholder for custom user serialization
@@ -24,14 +25,32 @@ module.exports = function (passport, user) {
     callbackURL: process.env.G5_AUTH_REDIRECT_URI
   },
   function (accessToken, refreshToken, profile, cb) {
-    //use access token for bearer token to v1/me to get the users info then create the user in the database
-    console.log(profile)
     console.log(accessToken)
-    console.log(refreshToken)
-    User.findOrCreate({where: {id: profile.id}, defaults: {token: accessToken, email: 'testing123'}}).then(function (err, user) {
-      console.log(user)
-      return cb(err, user)
-    })
+    console.log(cb)
+    // use access token for bearer token to me endpoint to get the users info then create the user in the database
+    request
+      .get(process.env.G5_AUTH_ME_ENDPOINT, {
+        'auth': {
+          'bearer': accessToken
+        }
+      }, (error, response, body) => {
+        body = JSON.parse(body)
+        if (response.statusCode === 200) {
+          // the token is valid
+          User.findOrCreate({ where: { email: body.email }, defaults: { token: accessToken, first_name: body.first_name, last_name: body.last_name, title: body.title, role: body.roles[0].name } })
+            .spread((user, created, err) => {
+              console.log(user.get({
+                plain: true
+              }))
+              console.log(created)
+              // the token is invalid
+              return cb(err, user)
+            })
+        } else {
+          // the token is invalid
+          return cb(error, user)
+        }
+      })
   }
   ))
 }

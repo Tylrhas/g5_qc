@@ -7,12 +7,26 @@ module.exports = function (sequelize, Sequelize) {
       type: Sequelize.INTEGER
     },
 
-    token: {
+    first_name: {
       type: Sequelize.STRING
       // notEmpty: true
     },
 
-    name: {
+    last_name: {
+      type: Sequelize.STRING
+      // notEmpty: true
+    },
+
+    title: {
+      type: Sequelize.STRING
+      // notEmpty: true
+    },
+
+    role: {
+      type: Sequelize.STRING
+      // notEmpty: true
+    },
+    token: {
       type: Sequelize.STRING
       // notEmpty: true
     },

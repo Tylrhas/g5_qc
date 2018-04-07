@@ -41,28 +41,28 @@ app.use(bodyParser.urlencoded({
 }))
 app.use(bodyParser.json())
 
+app.get('/g5_auth/users/auth/g5',
+  passport.authenticate('oauth2'))
+
 app.get('/g5_auth/users/auth/g5/callback',
-  passport.authenticate('oauth2', { failureRedirect: '/login' }),
+  passport.authenticate('oauth2', { failureRedirect: '/g5_auth/users/auth/g5' }),
   function (req, res) {
     // Successful authentication, redirect home.
-    res.redirect('/woot')
+    res.redirect('/')
   })
 
-app.get('/',
-  passport.authenticate('oauth2', { failureRedirect: '/login' }),
-  function (req, res) {
-    res.render('pages/index', { user: req.user })
-    // Successful authentication, redirect home.
-    res.redirect('/woot')
-  })
-
-app.post('/crawl', function (req, res) {
-  // load up the Custom Dictionary
-  var words = dictionary.load()
-  words.then(function (words) {
-    crawl.crawl(req.body.url, req, res, words)
-  })
+app.get('/', checkAuthentication, function (req, res) {
+  // Successful authentication, render home.
+  res.render('pages/index', { user: req.user })
 })
+
+// app.post('/crawl', function (req, res) {
+//   // load up the Custom Dictionary
+//   var words = dictionary.load()
+//   words.then(function (words) {
+//     crawl.crawl(req.body.url, req, res, words)
+//   })
+// })
 
 app.get('/dictionary', function (req, res) {
   // load up the Custom Dictionary
@@ -116,6 +116,15 @@ models.sequelize.sync().then(function () {
 }).catch(function (err) {
   console.log(err, 'Something went wrong with the Database Update!')
 })
-function enqueue(url) {
+function enqueue (url) {
   return models.jobQueue.create({ url })
+}
+
+function checkAuthentication (req, res, next) {
+  if (req.isAuthenticated()) {
+    // if user is looged in, req.isAuthenticated() will return true
+    next()
+  } else {
+    res.redirect('/g5_auth/users/auth/g5')
+  }
 }
