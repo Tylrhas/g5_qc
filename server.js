@@ -12,7 +12,10 @@ var session = require('express-session')
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: true,
-  saveUninitialized: true
+  saveUninitialized: true,
+  cookie: {
+    maxAge: 60000
+  }
 }))
 app.use(passport.initialize())
 app.use(passport.session()) // persistent login sessions
@@ -64,7 +67,7 @@ app.get('/', checkAuthentication, function (req, res) {
 //   })
 // })
 
-app.get('/dictionary', function (req, res) {
+app.get('/dictionary', checkAuthentication, function (req, res) {
   // load up the Custom Dictionary
   var words = dictionary.load()
   words.then(function (words) {
@@ -72,7 +75,7 @@ app.get('/dictionary', function (req, res) {
   })
 })
 
-app.post('/dictionary/add', function (req, res) {
+app.post('/dictionary/add', checkAuthentication, function (req, res) {
   console.log(req.body)
   // add word to the custom dictionary
   dictionary.add(req.body.add).then(function (newDictionary) {
@@ -80,7 +83,7 @@ app.post('/dictionary/add', function (req, res) {
   })
 })
 
-app.post('/dictionary/remove', function (req, res) {
+app.post('/dictionary/remove', checkAuthentication, function (req, res) {
   // add word to the custom dictionary
   dictionary.remove(req.body.remove).then(function (newDictionary) {
     res.json(newDictionary)
