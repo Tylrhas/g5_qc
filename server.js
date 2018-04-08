@@ -18,7 +18,17 @@ app.use(session({
   }
 }))
 app.use(passport.initialize())
-app.use(passport.session()) // persistent login sessions
+app.use(passport.session())
+
+// force SSL Certs
+
+app.use(function (req, res, next) {
+  if ((req.get('X-Forwarded-Proto') !== 'https')) {
+    res.redirect('https://' + req.get('Host') + req.url)
+  } else {
+    next()
+  }
+})
 
 // load passport strategies
 require('./app/config/passport.js')(passport, models.user)
@@ -119,11 +129,11 @@ models.sequelize.sync().then(function () {
 }).catch(function (err) {
   console.log(err, 'Something went wrong with the Database Update!')
 })
-function enqueue (url) {
+function enqueue(url) {
   return models.jobQueue.create({ url })
 }
 
-function checkAuthentication (req, res, next) {
+function checkAuthentication(req, res, next) {
   if (req.isAuthenticated()) {
     // if user is looged in, req.isAuthenticated() will return true
     next()
