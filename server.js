@@ -1,6 +1,38 @@
 // Express
 var express = require('express')
 var app = express()
+
+// Models
+var models = require('./app/models')
+
+// Passport
+var passport = require('passport')
+var session = require('express-session')
+
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: true,
+  saveUninitialized: true,
+  cookie: {
+    maxAge: 60000
+  }
+}))
+app.use(passport.initialize())
+app.use(passport.session())
+
+// force SSL Certs
+
+app.use(function (req, res, next) {
+  if ((req.get('X-Forwarded-Proto') !== 'https')) {
+    res.redirect('https://' + req.get('Host') + req.url)
+  } else {
+    next()
+  }
+})
+
+// load passport strategies
+require('./app/config/passport.js')(passport, models.user)
+
 // Socket IO
 var server = require('http').Server(app)
 var io = require('socket.io')(server)
@@ -8,13 +40,12 @@ var io = require('socket.io')(server)
 var bodyParser = require('body-parser')
 var crawl = require('./app/controllers/crawl.js')
 var dictionary = require('./app/controllers/custom-dictionary.js')
-var models = require('./app/models')
 
 app.set('views', './app/views')
 app.set('view engine', 'ejs')
 
 // app.use(favicon(path.join(__dirname, 'public', 'favicon.png')))
-var port = process.env.PORT || 5000
+var port = process.env.PORT || 3000
 app.use(express.static(__dirname + '/public'))
 
 // For BodyParser
@@ -23,19 +54,30 @@ app.use(bodyParser.urlencoded({
 }))
 app.use(bodyParser.json())
 
-app.get('/', function (req, res) {
+app.get('/g5_auth/users/auth/g5',
+  passport.authenticate('oauth2'))
+
+app.get('/g5_auth/users/auth/g5/callback',
+  passport.authenticate('oauth2', { failureRedirect: '/g5_auth/users/auth/g5' }),
+  function (req, res) {
+    // Successful authentication, redirect home.
+    res.redirect('/')
+  })
+
+app.get('/', checkAuthentication, function (req, res) {
+  // Successful authentication, render home.
   res.render('pages/index', { user: req.user })
 })
 
-app.post('/crawl', function (req, res) {
-  // load up the Custom Dictionary
-  var words = dictionary.load()
-  words.then(function (words) {
-    crawl.crawl(req.body.url, req, res, words)
-  })
-})
+// app.post('/crawl', function (req, res) {
+//   // load up the Custom Dictionary
+//   var words = dictionary.load()
+//   words.then(function (words) {
+//     crawl.crawl(req.body.url, req, res, words)
+//   })
+// })
 
-app.get('/dictionary', function (req, res) {
+app.get('/dictionary', checkAuthentication, function (req, res) {
   // load up the Custom Dictionary
   var words = dictionary.load()
   words.then(function (words) {
@@ -43,7 +85,7 @@ app.get('/dictionary', function (req, res) {
   })
 })
 
-app.post('/dictionary/add', function (req, res) {
+app.post('/dictionary/add', checkAuthentication, function (req, res) {
   console.log(req.body)
   // add word to the custom dictionary
   dictionary.add(req.body.add).then(function (newDictionary) {
@@ -51,7 +93,7 @@ app.post('/dictionary/add', function (req, res) {
   })
 })
 
-app.post('/dictionary/remove', function (req, res) {
+app.post('/dictionary/remove', checkAuthentication, function (req, res) {
   // add word to the custom dictionary
   dictionary.remove(req.body.remove).then(function (newDictionary) {
     res.json(newDictionary)
@@ -87,6 +129,15 @@ models.sequelize.sync().then(function () {
 }).catch(function (err) {
   console.log(err, 'Something went wrong with the Database Update!')
 })
-function enqueue (url) {
-  return models.jobQueue.create({url})
+function enqueue(url) {
+  return models.jobQueue.create({ url })
+}
+
+function checkAuthentication(req, res, next) {
+  if (req.isAuthenticated()) {
+    // if user is looged in, req.isAuthenticated() will return true
+    next()
+  } else {
+    res.redirect('/g5_auth/users/auth/g5')
+  }
 }
