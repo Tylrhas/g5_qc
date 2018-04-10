@@ -9,3 +9,4 @@ It Checks the following:
   - Check for '&nbsp;' (To-Do)
   - Check for Hub Thumbs (To-Do)
   - Check for Images without alt (To-Do)
+  - Check the fonts that are in the CMS to the ones that are in typekit (To-Do)
