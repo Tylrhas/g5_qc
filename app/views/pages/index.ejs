@@ -21,7 +21,44 @@
                 </div>
             </div>
             <div class="tab-pane fade" id="results" role="tabpanel" aria-labelledby="results-tab">
-                
+
+            </div>
+            <div class="tab-pane jobs" id="jobs" role="tabpanel" aria-labelledby="jobs-tab">
+                <div class="container">
+                    <table class="table table-bordered table-striped">
+                        <tbody>
+                            <tr>
+                                <th>id</th>
+                                <th>URL</th>
+                                <th>Processing</th>
+                                <th>Created</th>
+                                <th>Updated</th>
+                            </tr>
+                            <% for(var i=0; i < jobs.length; i++) { %>
+                                <tr>
+                                    <td>
+                                        <%= jobs[i].id %>
+                                    </td>
+                                    <td>
+                                        <%= jobs[i].url %>
+                                    </td>
+                                    <td>
+                                        <%= jobs[i].processing %>
+                                    </td>
+                                    <td>
+                                        <%= jobs[i].createdAt %>
+                                    </td>
+                                    <td>
+                                        <%= jobs[i].updatedAt %>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-danger" jobId="<%= jobs[i].id %>">Delete Job</button>
+                                    </td>
+                                </tr>
+                                <% } %>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-<% include ../partials/footer.ejs %>
+        <% include ../partials/footer.ejs %>

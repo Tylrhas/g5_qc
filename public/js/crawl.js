@@ -47,8 +47,7 @@ function renderResults (data) {
   $('#expand_all').click(function () {
     if ($(this).hasClass('active')) {
       $('.qc-checks').removeClass('show')
-    }
-    else {
+    } else {
       $('.qc-checks').addClass('show')
     }
     $(this).toggleClass('active')
@@ -154,3 +153,17 @@ function renderGrammar (data) {
     }
   }
 }
+
+$('#jobs .btn-danger').click(function () {
+  var data = {
+    remove: $(this).attr('jobId')
+  }
+  $.ajax({
+    type: 'POST',
+    url: '/jobs/remove',
+    data: data,
+    success: function () {
+    },
+    dataType: 'JSON'
+  })
+})

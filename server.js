@@ -65,8 +65,10 @@ app.get('/g5_auth/users/auth/g5/callback',
   })
 
 app.get('/', checkAuthentication, function (req, res) {
-  // Successful authentication, render home.
-  res.render('pages/index', { user: req.user })
+  models.jobQueue.findAll().then(results => {
+    // Successful authentication, render home.
+    res.render('pages/index', { user: req.user, jobs: results })
+  })
 })
 
 // app.post('/crawl', function (req, res) {
@@ -100,6 +102,28 @@ app.post('/dictionary/remove', checkAuthentication, function (req, res) {
   })
 })
 
+app.post('/jobs/remove', checkAuthentication, function (req, res) {
+  // add word to the custom dictionary
+  models.jobQueue.destroy({
+    where: {
+      id: req.body.remove
+    }
+  }).then(function () {
+    res.status(200)
+    var jobQueue = models.jobQueue.findOne({
+      where: {
+        processing: true
+      }
+    })
+    jobQueue.then(function (jobQueue) {
+      if (!jobQueue) {
+        console.log('here we go!')
+        crawl.crawl(io)
+      }
+    })
+  })
+})
+
 server.listen(port)
 
 io.on('connection', function (socket) {
@@ -129,11 +153,11 @@ models.sequelize.sync().then(function () {
 }).catch(function (err) {
   console.log(err, 'Something went wrong with the Database Update!')
 })
-function enqueue(url) {
+function enqueue (url) {
   return models.jobQueue.create({ url })
 }
 
-function checkAuthentication(req, res, next) {
+function checkAuthentication (req, res, next) {
   if (req.isAuthenticated()) {
     // if user is looged in, req.isAuthenticated() will return true
     next()
