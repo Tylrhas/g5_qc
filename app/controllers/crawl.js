@@ -42,6 +42,16 @@ async function crawl (io) {
     var lazyLoad = await page.$$eval('img.lazy-load', images => {
       return images.map((img) => img.getAttribute('data-src'))
     })
+
+    var CTAs = await page.$$eval('.cta-item a', ctas => {
+      return ctas.map((cta) => {
+        return {
+          href: cta.getAttribute('href'),
+          text: cta.textContent
+        }
+      })
+    })
+
     // set the url key to an empty object
     crawlResults.crawled[url] = {}
 
@@ -50,6 +60,9 @@ async function crawl (io) {
 
     // grammar Check the Copy
     crawlResults.crawled[url].grammar = grammar.check(copy)
+
+    // list the CTAs
+    crawlResults.crawled[url].ctas = CTAs
 
     crawlResults.crawled[url].lazyLoad = lazyLoad
     crawled.push(url)
@@ -75,6 +88,15 @@ async function crawl (io) {
           return paragraphs.map((paragraph) => paragraph.textContent)
         })
 
+        var CTAs = await page.$$eval('.cta-item a', ctas => {
+          return ctas.map((cta) => {
+            return {
+              href: cta.getAttribute('href'),
+              text: cta.textContent
+            }
+          })
+        })
+
         // set the url key to an empty object
         crawlResults.crawled[urls[l]] = {}
 
@@ -85,6 +107,10 @@ async function crawl (io) {
 
         // grammar Check the Copy
         crawlResults.crawled[urls[l]].grammar = grammar.check(copy)
+
+        // CTA Checkwh
+        crawlResults.crawled[urls[l]].ctas = CTAs
+        
 
         // get links on the page
         urls = await getLinks(page, urls, url)
