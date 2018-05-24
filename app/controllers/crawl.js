@@ -25,7 +25,7 @@ async function crawl (io) {
   page.on('error', (error) => {
     console.log('Page Error:', error)
   })
-  io.emit('jobStart', { jobID: job[0].id })
+  io.emit('jobStart', job[0])
   try {
     // load the page
     await page.goto(url)
