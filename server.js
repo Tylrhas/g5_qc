@@ -22,13 +22,13 @@ app.use(passport.session())
 
 // force SSL Certs
 
-app.use(function (req, res, next) {
-  if ((req.get('X-Forwarded-Proto') !== 'https')) {
-    res.redirect('https://' + req.get('Host') + req.url)
-  } else {
-    next()
-  }
-})
+// app.use(function (req, res, next) {
+//   if ((req.get('X-Forwarded-Proto') !== 'https')) {
+//     res.redirect('https://' + req.get('Host') + req.url)
+//   } else {
+//     next()
+//   }
+// })
 
 // load passport strategies
 require('./app/config/passport.js')(passport, models.user)
@@ -70,14 +70,6 @@ app.get('/', checkAuthentication, function (req, res) {
     res.render('pages/index', { user: req.user, jobs: results })
   })
 })
-
-// app.post('/crawl', function (req, res) {
-//   // load up the Custom Dictionary
-//   var words = dictionary.load()
-//   words.then(function (words) {
-//     crawl.crawl(req.body.url, req, res, words)
-//   })
-// })
 
 app.get('/dictionary', checkAuthentication, function (req, res) {
   // load up the Custom Dictionary
