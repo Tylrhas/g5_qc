@@ -170,7 +170,7 @@ function renderCTAs (data) {
       $(target).text('CTAs')
       if (i2 === 0) {
         // it is the first image load in the table HTML
-        $('#webpage' + i).append('<div class="row collapse" id="cta-check-' + i + '"><table class="table table-bordered table-striped"><tbody id="cta-table-' + i + '"></tbody></table></div>')
+        $('#webpage' + i).append('<div class="row collapse" id="cta-check-' + i + '"><table class="table table-bordered table-striped"><tbody id="cta-table-' + i + '"><tr><th>Text</th><th>Links</th></tr></tbody></table></div>')
       }
       $(target).addClass('btn-success')
       if (ctas[i2].href === '') {
