@@ -88,7 +88,7 @@ async function crawl (io) {
           return paragraphs.map((paragraph) => paragraph.textContent)
         })
 
-        var CTAs = await page.$$eval('.cta-item a', ctas => {
+        CTAs = await page.$$eval('.cta-item a', ctas => {
           return ctas.map((cta) => {
             return {
               href: cta.getAttribute('href'),
@@ -108,9 +108,8 @@ async function crawl (io) {
         // grammar Check the Copy
         crawlResults.crawled[urls[l]].grammar = grammar.check(copy)
 
-        // CTA Checkwh
+        // CTA Check
         crawlResults.crawled[urls[l]].ctas = CTAs
-        
 
         // get links on the page
         urls = await getLinks(page, urls, url)

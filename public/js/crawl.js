@@ -22,10 +22,10 @@ socket.on('qcDone', function (data) {
   }
 })
 socket.on('jobStart', function (data) {
-  console.log(data.jobID)
+  console.log(data.id)
   console.log(jobid)
   // check if completed job is the correct job
-  if (jobid === data.jobID) {
+  if (jobid === data.id) {
     $('#crawl').html('Job Running')
   }
 })
@@ -36,6 +36,7 @@ function renderResults (data) {
   renderSpelling(data)
   renderLazyLoad(data)
   renderGrammar(data)
+  renderCTAs(data)
   $('#crawl').html('Done')
   $('#results-tab').click()
 
@@ -119,7 +120,11 @@ function createWebButton (i, webPage) {
   createQC(i)
 }
 function createQC (i) {
-  var qcCheck = '<div class="qc-checks container collapse show" id="webpage' + i + '"><div class="row"><a class="col-4 center qc-check btn" id="spelling-' + i + '" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseExample" href="#spelling-words-' + i + '">Spelling</a><a class="col-4 center qc-check btn" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="grammar-check-' + i + '" href="#grammar-check-' + i + '" id="grammar-' + i + '" >Grammar</a><a class="col-4 center qc-check btn" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="lazy-load-' + i + '" id="lazy-' + i + '" href="#lazy-load-' + i + '">Lazy Load</a></div></div>'
+  var lazyLoadButton = '<a class="col-3 center qc-check btn" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="lazy-load-' + i + '" id="lazy-' + i + '" href="#lazy-load-' + i + '">Lazy Load</a>'
+  var grammarButton = '<a class="col-3 center qc-check btn" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="grammar-check-' + i + '" href="#grammar-check-' + i + '" id="grammar-' + i + '" >Grammar</a>'
+  var spellingButton = '<a class="col-3 center qc-check btn" id="spelling-' + i + '" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseExample" href="#spelling-words-' + i + '">Spelling</a>'
+  var CTAButton = '<a class="col-3 center qc-check btn" id="cta-' + i + '" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseExample" href="#cta-check-' + i + '">CTAs</a>'
+  var qcCheck = '<div class="qc-checks container collapse show" id="webpage' + i + '"><div class="row">' + spellingButton + grammarButton + lazyLoadButton + CTAButton + '</div></div>'
   $('#results').append(qcCheck)
 }
 function createWord (i, i2, word) {
@@ -150,6 +155,31 @@ function renderGrammar (data) {
         let grammarHTML = '<tr><td>' + value + ' : ' + message + '</td></tr>'
         document.getElementById('grammar-table-' + i).insertAdjacentHTML('beforeend', grammarHTML)
       }
+    }
+  }
+}
+
+function renderCTAs (data) {
+  for (let i = 0; i < Object.keys(data.crawled).length; i++) {
+    let webPage = Object.keys(data.crawled)[i]
+    let ctas = data.crawled[webPage].ctas
+    let target = '#cta-' + i
+    $(target).text('NO CTAs')
+
+    for (let i2 = 0; i2 < ctas.length; i2++) {
+      $(target).text('CTAs')
+      if (i2 === 0) {
+        // it is the first image load in the table HTML
+        $('#webpage' + i).append('<div class="row collapse" id="cta-check-' + i + '"><table class="table table-bordered table-striped"><tbody id="cta-table-' + i + '"></tbody></table></div>')
+      }
+      $(target).addClass('btn-success')
+      if (ctas[i2].href === '') {
+        // make it red
+        $(target).removeClass('btn-success')
+        $(target).addClass('btn-danger')
+      }
+      let row = '<tr><td>' + ctas[i2].text + ' </td><td> ' + ctas[i2].href + '</td></tr>'
+      document.getElementById('cta-table-' + i).insertAdjacentHTML('beforeend', row)
     }
   }
 }
