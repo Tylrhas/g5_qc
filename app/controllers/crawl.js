@@ -34,6 +34,21 @@ async function crawl (io) {
     // scrape all of the URLs on the current page
     urls = await getLinks(page, urls, url)
 
+    // Global checks
+    const structuredDataWidget = await page.$$eval('.structured-data-widget', structuredDataWidgets => structuredDataWidgets.length)
+    console.log(structuredDataWidget)
+
+    if (structuredDataWidget >= 1) {
+      // structured data widget was found
+      crawlResults.global.structuredDataWidget = true
+      console.log(true)
+    } else {
+      // there is no structured data widget
+      crawlResults.global.structuredDataWidget = false
+      console.log(true)
+    }
+    // End Global checks
+
     // scrape the copy
     var copy = await page.$$eval('.html-content p , h1, h2, h3, h4, h5, h6, .html-content li ', paragraphs => {
       return paragraphs.map((paragraph) => paragraph.textContent)
@@ -52,19 +67,6 @@ async function crawl (io) {
         }
       })
     })
-
-    const structuredDataWidget = await page.$$eval('.structured-data-widget', structuredDataWidgets => structuredDataWidgets.length)
-    console.log(structuredDataWidget)
-
-    if (structuredDataWidget >= 1) {
-      // structured data widget was found
-      crawlResults.global.structuredDataWidget = true
-      console.log(true)
-    } else {
-      // there is no structured data widget
-      crawlResults.global.structuredDataWidget = false
-      console.log(true)
-    }
 
     // set the url key to an empty object
     crawlResults.crawled[url] = {}
