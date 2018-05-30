@@ -40,11 +40,11 @@ async function crawl (io) {
 
     if (structuredDataWidget >= 1) {
       // structured data widget was found
-      crawlResults.global.structuredDataWidget = true
+      crawlResults.global.structured_Data_Widget = true
       console.log(true)
     } else {
       // there is no structured data widget
-      crawlResults.global.structuredDataWidget = false
+      crawlResults.global.structured_Data_Widget = false
       console.log(true)
     }
     // End Global checks
