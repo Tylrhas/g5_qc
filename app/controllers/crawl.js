@@ -4,7 +4,7 @@ const grammar = require('./grammar.js')
 const models = require('../models')
 var dictionary = require('../controllers/custom-dictionary.js')
 
-// 
+//
 
 async function crawl (io) {
   // set empty results object for spell check results
@@ -38,6 +38,11 @@ async function crawl (io) {
     // load the page
     await page.goto(url)
 
+    // get the last published date
+    var publishDate = await page.$eval('body', body => {
+      return body.innerHTML.match(/<!-- Updated.*?-->/g)[0].match(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]/)[0]
+    })
+    console.log(publishDate)
     // scrape all of the URLs on the current page
     urls = await getLinks(page, urls, url)
   } catch (error) {
