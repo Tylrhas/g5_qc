@@ -4,7 +4,7 @@ const grammar = require('./grammar.js')
 const models = require('../models')
 var dictionary = require('../controllers/custom-dictionary.js')
 
-// { args: ['--no-sandbox', '--disable-setuid-sandbox'] }
+// 
 
 async function crawl (io) {
   // set empty results object for spell check results
@@ -27,7 +27,7 @@ async function crawl (io) {
   var words = await dictionary.load()
 
   // initilize the browser
-  const browser = await puppeteer.launch({ headless: false })
+  const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] })
   const page = await browser.newPage()
 
   page.on('error', (error) => {
