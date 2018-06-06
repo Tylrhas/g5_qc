@@ -4,6 +4,8 @@ const grammar = require('./grammar.js')
 const models = require('../models')
 var dictionary = require('../controllers/custom-dictionary.js')
 
+// { args: ['--no-sandbox', '--disable-setuid-sandbox'] }
+
 async function crawl (io) {
   // set empty results object for spell check results
   var crawlResults = {
@@ -12,14 +14,20 @@ async function crawl (io) {
   }
   var crawled = []
   var urls = []
-
   var job = await getNext()
-  console.log(job)
-  await job[0].update({ processing: true })
-  var words = await dictionary.load()
   var url = job[0].url
+  var lazyLoad
+  var copy
+  var CTAs
+  var l = 0
+
+  await job[0].update({ processing: true })
+
+  // Initilize the dictionary
+  var words = await dictionary.load()
+
   // initilize the browser
-  const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] })
+  const browser = await puppeteer.launch({ headless: false })
   const page = await browser.newPage()
 
   page.on('error', (error) => {
@@ -32,44 +40,9 @@ async function crawl (io) {
 
     // scrape all of the URLs on the current page
     urls = await getLinks(page, urls, url)
-
-    // scrape the copy
-    var copy = await page.$$eval('.html-content p , h1, h2, h3, h4, h5, h6, .html-content li ', paragraphs => {
-      return paragraphs.map((paragraph) => paragraph.textContent)
-    })
-
-    // get all images with lazyload enabled
-    var lazyLoad = await page.$$eval('img.lazy-load', images => {
-      return images.map((img) => img.getAttribute('data-src'))
-    })
-
-    var CTAs = await page.$$eval('.cta-item a', ctas => {
-      return ctas.map((cta) => {
-        return {
-          href: cta.getAttribute('href'),
-          text: cta.textContent
-        }
-      })
-    })
-
-    // set the url key to an empty object
-    crawlResults.crawled[url] = {}
-
-    // spellcheck the copy
-    crawlResults.crawled[url].copy = spell.check(copy, words)
-
-    // grammar Check the Copy
-    crawlResults.crawled[url].grammar = grammar.check(copy)
-
-    // list the CTAs
-    crawlResults.crawled[url].ctas = CTAs
-
-    crawlResults.crawled[url].lazyLoad = lazyLoad
-    crawled.push(url)
   } catch (error) {
     crawlResults.error.push(url)
   }
-  var l = 0
   while (crawled.length < urls.length) {
     // do not crawl any urls with /# in them
     if (urls[l].indexOf('/#') === -1) {
@@ -117,15 +90,15 @@ async function crawl (io) {
         // add this page to error'd pages
         crawlResults.error.push(urls[l])
       }
-      // increase the url
     }
     // push the urls to the crawled array
     crawled.push(urls[l])
+    // increase the url index
     l++
   }
-  console.log('closing')
   browser.close()
-  // add job id
+
+  // add job id to the results
   crawlResults.jobID = job[0].id
   io.emit('qcDone', crawlResults)
   await job[0].destroy()
@@ -133,7 +106,6 @@ async function crawl (io) {
   if (jobQueue > 0) {
     return crawl(io)
   }
-  // res.json(crawlResults)
 }
 async function getLinks (page, urls, url) {
   // scrape all ancors on the page
@@ -149,7 +121,7 @@ async function getLinks (page, urls, url) {
   // remove duplicates, urls of a different domains and phone numbers
   let uniqueArray = []
   for (let i = 0; i < allAnchors.length; i++) {
-    if (uniqueArray.indexOf(allAnchors[i]) == -1 && !allAnchors[i].indexOf(url)) {
+    if (uniqueArray.indexOf(allAnchors[i]) === -1 && !allAnchors[i].indexOf(url)) {
       uniqueArray.push(allAnchors[i])
     }
   }
@@ -159,8 +131,6 @@ async function getLinks (page, urls, url) {
 function getNext () {
   return models.jobQueue.findAll({ limit: 1 })
 }
-
-// for lazy-load look for images with the class "lazy-load"
 
 // export Module
 module.exports.crawl = crawl

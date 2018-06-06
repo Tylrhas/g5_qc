@@ -33,7 +33,7 @@ function spellCheck (copy, dictionary) {
         word = word.replace('(', '')
         word = word.replace(')', '')
 
-        if (checkSpelling(word, dictionary)) {
+        if (checkSpelling(word, dictionary, mispelled)) {
           // word is mispelled
           mispelled.push(word)
         }
@@ -43,9 +43,9 @@ function spellCheck (copy, dictionary) {
   return mispelled
 }
 
-function checkSpelling (word, dictionary) {
-  if (!spellchecker.check(word) && dictionary.indexOf(word) == -1) {
-    // word is mispelled and not in custom dictonary
+function checkSpelling (word, dictionary, mispelled) {
+  if (!spellchecker.check(word) && dictionary.indexOf(word) === -1 && mispelled.indexOf(word) === -1) {
+    // word is mispelled and not in custom dictonary and not already called out on the page
     return true
   } else {
     return false
