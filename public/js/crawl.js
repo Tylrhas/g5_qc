@@ -1,3 +1,5 @@
+import * as globalChecks from './globalChecks.js'
+
 var jobid
 
 $('#crawl').click(function () {
@@ -37,13 +39,9 @@ function renderResults (data) {
   renderLazyLoad(data)
   renderGrammar(data)
   renderCTAs(data)
+  globalChecks.render(data)
   $('#crawl').html('Done')
   $('#results-tab').click()
-
-  // $('#expand_all').click(function () {
-  //   console.log('clicked')
-  //   $('.qc-checks').collapse('toggle')
-  // })
 
   $('#expand_all').click(function () {
     if ($(this).hasClass('active')) {

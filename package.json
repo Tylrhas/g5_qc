@@ -31,6 +31,7 @@
     "request": "^2.85.0",
     "rousseau": "^1.0.5",
     "sequelize": "^4.37.1",
+    "serve-favicon": "^2.5.0",
     "socket.io": "^2.0.4"
   },
   "devDependencies": {

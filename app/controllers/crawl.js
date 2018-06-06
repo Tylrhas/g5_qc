@@ -8,7 +8,8 @@ async function crawl (io) {
   // set empty results object for spell check results
   var crawlResults = {
     crawled: {},
-    error: []
+    error: [],
+    global: {}
   }
   var crawled = []
   var urls = []
@@ -32,6 +33,21 @@ async function crawl (io) {
 
     // scrape all of the URLs on the current page
     urls = await getLinks(page, urls, url)
+
+    // Global checks
+    const structuredDataWidget = await page.$$eval('.structured-data-widget', structuredDataWidgets => structuredDataWidgets.length)
+    console.log(structuredDataWidget)
+
+    if (structuredDataWidget >= 1) {
+      // structured data widget was found
+      crawlResults.global.structured_Data_Widget = true
+      console.log(true)
+    } else {
+      // there is no structured data widget
+      crawlResults.global.structured_Data_Widget = false
+      console.log(true)
+    }
+    // End Global checks
 
     // scrape the copy
     var copy = await page.$$eval('.html-content p , h1, h2, h3, h4, h5, h6, .html-content li ', paragraphs => {
@@ -123,7 +139,6 @@ async function crawl (io) {
     crawled.push(urls[l])
     l++
   }
-  console.log('closing')
   browser.close()
   // add job id
   crawlResults.jobID = job[0].id
@@ -159,8 +174,6 @@ async function getLinks (page, urls, url) {
 function getNext () {
   return models.jobQueue.findAll({ limit: 1 })
 }
-
-// for lazy-load look for images with the class "lazy-load"
 
 // export Module
 module.exports.crawl = crawl
