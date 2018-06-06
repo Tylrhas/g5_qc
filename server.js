@@ -22,13 +22,15 @@ app.use(passport.session())
 
 // force SSL Certs
 
-// app.use(function (req, res, next) {
-//   if ((req.get('X-Forwarded-Proto') !== 'https')) {
-//     res.redirect('https://' + req.get('Host') + req.url)
-//   } else {
-//     next()
-//   }
-// })
+if (process.env.env !== 'dev') {
+  app.use(function (req, res, next) {
+    if ((req.get('X-Forwarded-Proto') !== 'https')) {
+      res.redirect('https://' + req.get('Host') + req.url)
+    } else {
+      next()
+    }
+  })
+}
 
 // load passport strategies
 require('./app/config/passport.js')(passport, models.user)
@@ -41,10 +43,14 @@ var bodyParser = require('body-parser')
 var crawl = require('./app/controllers/crawl.js')
 var dictionary = require('./app/controllers/custom-dictionary.js')
 
+var favicon = require('serve-favicon')
+
 app.set('views', './app/views')
 app.set('view engine', 'ejs')
 
-// app.use(favicon(path.join(__dirname, 'public', 'favicon.png')))
+var path = require('path')
+app.use(favicon(path.join(__dirname, 'public', 'favicon.png')))
+
 var port = process.env.PORT || 3000
 app.use(express.static(__dirname + '/public'))
 

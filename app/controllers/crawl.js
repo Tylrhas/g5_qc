@@ -10,7 +10,8 @@ async function crawl (io) {
   // set empty results object for spell check results
   var crawlResults = {
     crawled: {},
-    error: []
+    error: [],
+    global: {}
   }
   var crawled = []
   var urls = []
@@ -45,6 +46,58 @@ async function crawl (io) {
     console.log(publishDate)
     // scrape all of the URLs on the current page
     urls = await getLinks(page, urls, url)
+<<<<<<< HEAD
+=======
+
+    // Global checks
+    const structuredDataWidget = await page.$$eval('.structured-data-widget', structuredDataWidgets => structuredDataWidgets.length)
+    console.log(structuredDataWidget)
+
+    if (structuredDataWidget >= 1) {
+      // structured data widget was found
+      crawlResults.global.structured_Data_Widget = true
+      console.log(true)
+    } else {
+      // there is no structured data widget
+      crawlResults.global.structured_Data_Widget = false
+      console.log(true)
+    }
+    // End Global checks
+
+    // scrape the copy
+    var copy = await page.$$eval('.html-content p , h1, h2, h3, h4, h5, h6, .html-content li ', paragraphs => {
+      return paragraphs.map((paragraph) => paragraph.textContent)
+    })
+
+    // get all images with lazyload enabled
+    var lazyLoad = await page.$$eval('img.lazy-load', images => {
+      return images.map((img) => img.getAttribute('data-src'))
+    })
+
+    var CTAs = await page.$$eval('.cta-item a', ctas => {
+      return ctas.map((cta) => {
+        return {
+          href: cta.getAttribute('href'),
+          text: cta.textContent
+        }
+      })
+    })
+
+    // set the url key to an empty object
+    crawlResults.crawled[url] = {}
+
+    // spellcheck the copy
+    crawlResults.crawled[url].copy = spell.check(copy, words)
+
+    // grammar Check the Copy
+    crawlResults.crawled[url].grammar = grammar.check(copy)
+
+    // list the CTAs
+    crawlResults.crawled[url].ctas = CTAs
+
+    crawlResults.crawled[url].lazyLoad = lazyLoad
+    crawled.push(url)
+>>>>>>> 4e7e73f0a7bf6744086f107739e3998391075a40
   } catch (error) {
     crawlResults.error.push(url)
   }
