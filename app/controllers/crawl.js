@@ -39,15 +39,8 @@ async function crawl (io) {
     // load the page
     await page.goto(url)
 
-    // get the last published date
-    var publishDate = await page.$eval('body', body => {
-      return body.innerHTML.match(/<!-- Updated.*?-->/g)[0].match(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]/)[0]
-    })
-    console.log(publishDate)
     // scrape all of the URLs on the current page
     urls = await getLinks(page, urls, url)
-<<<<<<< HEAD
-=======
 
     // Global checks
     const structuredDataWidget = await page.$$eval('.structured-data-widget', structuredDataWidgets => structuredDataWidgets.length)
@@ -62,42 +55,16 @@ async function crawl (io) {
       crawlResults.global.structured_Data_Widget = false
       console.log(true)
     }
+
+    // get the last published date
+    var publishDate = await page.$eval('body', body => {
+      return body.innerHTML.match(/<!-- Updated (.*) - CMS:.* -->/)[0]
+    })
+    crawlResults.global.publish_Date = publishDate
+    
     // End Global checks
 
-    // scrape the copy
-    var copy = await page.$$eval('.html-content p , h1, h2, h3, h4, h5, h6, .html-content li ', paragraphs => {
-      return paragraphs.map((paragraph) => paragraph.textContent)
-    })
-
-    // get all images with lazyload enabled
-    var lazyLoad = await page.$$eval('img.lazy-load', images => {
-      return images.map((img) => img.getAttribute('data-src'))
-    })
-
-    var CTAs = await page.$$eval('.cta-item a', ctas => {
-      return ctas.map((cta) => {
-        return {
-          href: cta.getAttribute('href'),
-          text: cta.textContent
-        }
-      })
-    })
-
-    // set the url key to an empty object
-    crawlResults.crawled[url] = {}
-
-    // spellcheck the copy
-    crawlResults.crawled[url].copy = spell.check(copy, words)
-
-    // grammar Check the Copy
-    crawlResults.crawled[url].grammar = grammar.check(copy)
-
-    // list the CTAs
-    crawlResults.crawled[url].ctas = CTAs
-
-    crawlResults.crawled[url].lazyLoad = lazyLoad
     crawled.push(url)
->>>>>>> 4e7e73f0a7bf6744086f107739e3998391075a40
   } catch (error) {
     crawlResults.error.push(url)
   }

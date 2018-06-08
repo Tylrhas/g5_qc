@@ -1,0 +1,43 @@
+.qc-checks .col-md-4 div.row {
+  background-color: #f3f3f3;
+  padding: .5em;
+  margin-bottom: 10px;
+}
+
+.qc-checks .col-md-4 div.row span {
+  padding: 10px;
+  color: #fff;
+}
+
+.qc-checks .col-md-4 div.row h4 {
+  margin-left: .5em;
+}
+
+.failed {
+  background-color: #e94f3d;
+}
+
+.passed {
+  background-color: #3cba54
+}
+
+
+.qc-checks .col-md-4  a.active .row{
+  background-color: #172542;
+}
+
+.qc-checks .col-md-4 a.active h4 {
+  color: #fff;
+}
+
+.qc-checks a {
+  text-decoration: none;
+  color: #172542;
+}
+
+.qc-checks a:hover div.row {
+  background-color: #172542;
+}
+.qc-checks a:hover div h4 {
+  color:#fff;
+}
