@@ -1,4 +1,5 @@
 import * as globalChecks from './globalChecks.js'
+import * as results from './results.js'
 
 var jobid
 
@@ -20,7 +21,7 @@ socket.on('qcDone', function (data) {
   // check if completed job is the correct job
   if (jobid === data.jobID) {
     console.log(data)
-    renderResults(data)
+    results.render(data)
   }
 })
 socket.on('jobStart', function (data) {
