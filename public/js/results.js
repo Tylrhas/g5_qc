@@ -54,6 +54,7 @@ function addQCChecks (data) {
 function validateStatus () {
   // update the status on checks where they always have content
   var ctaStatus = true
+  var directionsStatus = true
   $('#v-pills-ctas table tr td:nth-child(2)').each(function (i) {
     console.log($(this).text())
     let text = $(this).text()
@@ -63,6 +64,17 @@ function validateStatus () {
     }
   })
   if (ctaStatus === true) {
+    $('#v-pills-ctas-tab .row span').removeClass('oi-warning failed').addClass('oi-check passed')
+  }
+  $('# v-pills-directions table tr td:nth-child(2)').each(function (i) {
+    console.log($(this).text())
+    let text = $(this).text()
+
+    if (text === 'false') {
+      directionsStatus = false
+    }
+  })
+  if (directionsStatus) {
     $('#v-pills-ctas-tab .row span').removeClass('oi-warning failed').addClass('oi-check passed')
   }
 }
