@@ -9,7 +9,7 @@ var DICT = spellchecker.parse({
 // Load a dictionary
 spellchecker.use(DICT)
 
-function spellCheck (copy, dictionary) {
+function spellCheck (copy, dictionary, page) {
   var mispelled = []
   // break array into groups of copy
   for (let i = 0; i < copy.length; i++) {
@@ -35,7 +35,7 @@ function spellCheck (copy, dictionary) {
 
         if (checkSpelling(word, dictionary, mispelled)) {
           // word is mispelled
-          mispelled.push(word)
+          mispelled.push([page, word])
         }
       }
     }

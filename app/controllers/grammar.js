@@ -1,6 +1,6 @@
 const rousseau = require('rousseau')
 // turn off passive voice and readability
-function check (copy) {
+function check (copy, page) {
   var grammar = []
 
   // break array into groups of copy
@@ -20,9 +20,10 @@ function check (copy) {
       } else {
         console.log(results)
         for (let i = 0; i < results.length; i++) {
-          var result = {}
-          result.value = results[i].value
-          result.message = results[i].message
+          var result = []
+          result.push(page)
+          result.push(results[i].value)
+          result.push(results[i].message)
           grammar.push(result)
         }
         // grammar.push(results)
