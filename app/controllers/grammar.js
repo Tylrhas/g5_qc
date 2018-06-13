@@ -12,7 +12,8 @@ function check (copy, page) {
         passive: false,
         simplicity: false,
         readibility: false,
-        adverbs: false
+        adverbs: false,
+        weasel: false
       }
     }, function (error, results) {
       if (error) {

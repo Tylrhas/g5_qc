@@ -50,6 +50,11 @@ async function crawl (io) {
         id: 'ga',
         name: 'GA #',
         results: []
+      },
+      alt: {
+        id: 'alt',
+        name: 'Alt Text',
+        results: []
       }
     },
     error: [],
