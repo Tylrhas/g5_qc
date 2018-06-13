@@ -107,7 +107,6 @@ function addCopyButton () {
     $(this).html(HTML)
   })
 
-
   var clipboard = new ClipboardJS('.btn')
 
   clipboard.on('success', function (e) {
