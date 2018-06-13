@@ -45,6 +45,11 @@ async function crawl (io) {
         id: 'h1',
         name: 'Multiple H1s',
         results: []
+      },
+      ga: {
+        id: 'ga',
+        name: 'GA #',
+        results: []
       }
     },
     error: [],
@@ -60,6 +65,7 @@ async function crawl (io) {
   var l = 0
   var directions
   var h1s
+  var GA
 
   await job[0].update({ processing: true })
 
@@ -117,17 +123,28 @@ async function crawl (io) {
     }
     // End Global checks
 
-    // Check for Multiple H1s on a single page
-    h1s = await page.$$eval('h1', h1s => {
-      return h1s.map((h1) => h1.textContent)
+    // // Check for Multiple H1s on a single page
+    // h1s = await page.$$eval('h1', h1s => {
+    //   return h1s.map((h1) => h1.textContent)
+    // })
+
+    // if (h1s.length > 1) {
+    //   // We have more than 1 h1 per page
+    //   for (let i = 0; i < h1s.length; i++) {
+    //     crawlResults.qcChecks.h1.results.push([url, h1s[i]])
+    //   }
+    // }
+
+    GA = await page.evaluate(function () {
+      return window.dataLayer[0].G5_CLIENT_TRACKING_ID
     })
 
-    if (h1s.length > 1) {
-      // We have more than 1 h1 per page
-      for (let i = 0; i < h1s.length; i++) {
-        crawlResults.qcChecks.h1.results.push([url, h1s[i]])
-      }
+    if (GA !== undefined) {
+      // GA is set up
+      crawlResults.qcChecks.GA.results.push([url, GA])
     }
+
+    console.log(GA)
     crawled.push(url)
   } catch (error) {
     crawlResults.error.push(url)
@@ -145,6 +162,18 @@ async function crawl (io) {
           return images.map((img) => img.getAttribute('data-src'))
         })
 
+        // Check for Multiple H1s on a single page
+        h1s = await page.$$eval('h1', h1s => {
+          return h1s.map((h1) => h1.textContent)
+        })
+
+        if (h1s.length > 1) {
+          // We have more than 1 h1 per page
+          for (let i = 0; i < h1s.length; i++) {
+            crawlResults.qcChecks.h1.results.push([urls[l], h1s[i]])
+          }
+        }
+
         // scrape the copy on the site
         copy = await page.$$eval('.html-content p , h1, h2, h3, h4, h5, h6, .html-content li ', paragraphs => {
           return paragraphs.map((paragraph) => paragraph.textContent)
@@ -161,7 +190,7 @@ async function crawl (io) {
           await page.type('.directions-start', startingAddress)
           await page.click('.directions-submit')
           // await page.waitForNavigation({ waitUntil: 'networkidle0' })
-          await page.waitForSelector('.adp-directions', {timeout: 2000})
+          await page.waitForSelector('.adp-directions', { timeout: 2000 })
 
           var endingAddresses = await page.$$eval('.adp-placemark .adp-text', addresses => {
             return addresses.map((address) => address.textContent)

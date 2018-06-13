@@ -90,6 +90,12 @@ function validateStatus () {
   if (pageSpeedStatus) {
     $('#v-pills-pagespeed-tab .row span').removeClass('oi-warning failed').addClass('oi-check passed')
   }
+
+  var GoogleAnalyticsStatus = $('#v-pills-ga table tr td').length
+
+  if (GoogleAnalyticsStatus === 0) {
+    $('#v-pills-ga-tab .row span').removeClass('oi-check passed').addClass('oi-warning failed')
+  }
 }
 
 function addCopyButton () {
@@ -101,6 +107,7 @@ function addCopyButton () {
     $(this).html(HTML)
   })
 
+
   var clipboard = new ClipboardJS('.btn')
 
   clipboard.on('success', function (e) {
@@ -109,7 +116,7 @@ function addCopyButton () {
     console.info('Trigger:', e.trigger)
 
     e.clearSelection()
-  });
+  })
 
   clipboard.on('error', function (e) {
     console.error('Action:', e.action)
