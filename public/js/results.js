@@ -55,6 +55,7 @@ function validateStatus () {
   // update the status on checks where they always have content
   var ctaStatus = true
   var directionsStatus = true
+  var pageSpeedStatus = true
   $('#v-pills-ctas table tr td:nth-child(2)').each(function (i) {
     console.log($(this).text())
     let text = $(this).text()
@@ -66,7 +67,7 @@ function validateStatus () {
   if (ctaStatus === true) {
     $('#v-pills-ctas-tab .row span').removeClass('oi-warning failed').addClass('oi-check passed')
   }
-  $('# v-pills-directions table tr td:nth-child(2)').each(function (i) {
+  $('#v-pills-directions table tr td:nth-child(2)').each(function (i) {
     console.log($(this).text())
     let text = $(this).text()
 
@@ -75,7 +76,19 @@ function validateStatus () {
     }
   })
   if (directionsStatus) {
-    $('#v-pills-ctas-tab .row span').removeClass('oi-warning failed').addClass('oi-check passed')
+    $('#v-pills-directions-tab .row span').removeClass('oi-warning failed').addClass('oi-check passed')
+  }
+  $('#v-pills-pagespeed table tr td:nth-child(2)').each(function (i) {
+    console.log($(this).text())
+    let text = $(this).text()
+    let score = parseInt(text.split('/')[0].trim())
+    console.log(score)
+    if (score <= 60) {
+      pageSpeedStatus = false
+    }
+  })
+  if (pageSpeedStatus) {
+    $('#v-pills-pagespeed-tab .row span').removeClass('oi-warning failed').addClass('oi-check passed')
   }
 }
 

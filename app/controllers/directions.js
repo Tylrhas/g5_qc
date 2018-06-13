@@ -7,8 +7,7 @@ async function checkDirections (page) {
 
   var endingAddresses = await page.$$eval('.adp-placemark .adp-text', addresses => {
     return addresses.map((address) => address.textContent)
-  })
-  console.log(endingAddresses)
+    console.log(emdomg)
 }
 
 module.exports.checkDirections = checkDirections

@@ -3,7 +3,8 @@ var spell = require('./spell.js')
 const grammar = require('./grammar.js')
 const models = require('../models')
 var dictionary = require('../controllers/custom-dictionary.js')
-// var directions = require('../controllers/directions.js')
+var pageSpeed = require('../controllers/pagespeed')
+// var directionsWidget = require('../controllers/directions.js')
 
 async function crawl (io) {
   // set empty results object for spell check results
@@ -34,6 +35,16 @@ async function crawl (io) {
         id: 'directions',
         name: 'Directions',
         results: []
+      },
+      pagespeed: {
+        id: 'pagespeed',
+        name: 'PageSpeed',
+        results: []
+      },
+      h1: {
+        id: 'h1',
+        name: 'Multiple H1s',
+        results: []
       }
     },
     error: [],
@@ -48,6 +59,7 @@ async function crawl (io) {
   var CTAs
   var l = 0
   var directions
+  var h1s
 
   await job[0].update({ processing: true })
 
@@ -69,6 +81,8 @@ async function crawl (io) {
   })
   io.emit('jobStart', job[0])
   try {
+    crawlResults.qcChecks.pagespeed.results = await pageSpeed.checks(page, url)
+
     // load the page
     await page.goto(url)
 
@@ -103,6 +117,17 @@ async function crawl (io) {
     }
     // End Global checks
 
+    // Check for Multiple H1s on a single page
+    h1s = await page.$$eval('h1', h1s => {
+      return h1s.map((h1) => h1.textContent)
+    })
+
+    if (h1s.length > 1) {
+      // We have more than 1 h1 per page
+      for (let i = 0; i < h1s.length; i++) {
+        crawlResults.qcChecks.h1.results.push([url, h1s[i]])
+      }
+    }
     crawled.push(url)
   } catch (error) {
     crawlResults.error.push(url)
@@ -129,7 +154,7 @@ async function crawl (io) {
 
         if (directions > 0) {
           // The Directions widget is on this page
-          // await directions.checkDirections(page)
+          // await directionsWidget.checkDirections(page)
           var startingAddress = process.env.STARTING_ADDRESS
           console.log(startingAddress)
           await page.focus('.directions-start')
