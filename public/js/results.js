@@ -56,6 +56,7 @@ function validateStatus () {
   var ctaStatus = true
   var directionsStatus = true
   var pageSpeedStatus = true
+  let noIndexStatus = true 
   $('#v-pills-ctas table tr td:nth-child(2)').each(function (i) {
     console.log($(this).text())
     let text = $(this).text()
@@ -95,6 +96,18 @@ function validateStatus () {
 
   if (GoogleAnalyticsStatus === 0) {
     $('#v-pills-ga-tab .row span').removeClass('oi-check passed').addClass('oi-warning failed')
+  }
+
+  $('#v-pills-noIndex table tr td:nth-child(2)').each(function (i) {
+    console.log($(this).text())
+    let text = $(this).text()
+
+    if (text === 'false') {
+      directionsStatus = false
+    }
+  })
+  if (noIndexStatus) {
+    $('#v-pills-noIndex-tab .row span').removeClass('oi-warning failed').addClass('oi-check passed')
   }
 }
 
