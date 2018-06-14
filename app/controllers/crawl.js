@@ -55,6 +55,11 @@ async function crawl (io) {
         id: 'alt',
         name: 'Alt Text',
         results: []
+      },
+      noIndex: {
+        id: 'noIndex',
+        name: 'No Index',
+        results: []
       }
     },
     error: [],
@@ -161,6 +166,36 @@ async function crawl (io) {
       // go to the new page
       try {
         await page.goto(urls[l])
+
+        // Check if the slug is privacy-policy
+        var pageSlug = urls[l].substring(urls[l].lastIndexOf('/') + 1)
+        if (pageSlug === 'privacy-policy') {
+          var privacyPolicyNoIndex = page.$$eval('meta[name=robots]', noIndex => noIndex.length)
+          // Check if the URL is a G5static Heroku or G5dns link if so look for two no idexes in the code
+          if (urls[l].includes('g5static') || urls[l].includes('heroku') || urls[l].includes('g5dns')) {
+            // This is the privacy policy page look for no index twice to show it is enabled for staging
+            if (privacyPolicyNoIndex <= 1) {
+              // not set to no index
+              crawlResults.qcChecks.noIndex.results.push([urls[l], false])
+            } else {
+              // Is set to no index
+              crawlResults.qcChecks.noIndex.results.push([urls[l], true])
+            }
+          } else {
+            // it only needs to show up once
+            if (privacyPolicyNoIndex >= 1) {
+              crawlResults.qcChecks.noIndex.results.push([urls[l], true])
+            } else {
+              crawlResults.qcChecks.noIndex.results.push([urls[l], false])
+            }
+          }
+        }
+
+        // get all images alt text except for the divider image
+        lazyLoad = await page.$$eval('img:not(.divider-image)', images => {
+          // get the image url and the alt text for it
+          return images.map((img) => img.getAttribute('alt'))
+        })
 
         // get all images with lazyload enabled
         lazyLoad = await page.$$eval('img.lazy-load', images => {
