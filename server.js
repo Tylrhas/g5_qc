@@ -85,7 +85,7 @@ app.get('/dictionary', checkAuthentication, function (req, res) {
   })
 })
 
-app.post('/dictionary/add', checkAuthentication, function (req, res) {
+app.post('/dictionary/add', function (req, res) {
   console.log(req.body)
   // add word to the custom dictionary
   dictionary.add(req.body.add).then(function (newDictionary) {
@@ -93,14 +93,14 @@ app.post('/dictionary/add', checkAuthentication, function (req, res) {
   })
 })
 
-app.post('/dictionary/remove', checkAuthentication, function (req, res) {
+app.post('/dictionary/remove', function (req, res) {
   // add word to the custom dictionary
   dictionary.remove(req.body.remove).then(function (newDictionary) {
     res.json(newDictionary)
   })
 })
 
-app.post('/jobs/remove', checkAuthentication, function (req, res) {
+app.post('/jobs/remove', function (req, res) {
   // add word to the custom dictionary
   models.jobQueue.destroy({
     where: {

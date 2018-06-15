@@ -34,7 +34,7 @@ function addQCChecks (data) {
     // Add Rows to the Table
     for (let resultIndex = 0; resultIndex < results.length; resultIndex++) {
       if (resultIndex === 0) {
-        // Create a new Row
+        // Create a heading in the table
         let tableHead = '<tr>'
         for (let rowIndex = 0; rowIndex < results[resultIndex].length; rowIndex++) {
           tableHead = tableHead + '<th>' + results[resultIndex][rowIndex] + '</th>'
@@ -46,6 +46,9 @@ function addQCChecks (data) {
         let row = '<tr>'
         for (let rowIndex = 0; rowIndex < results[resultIndex].length; rowIndex++) {
           row = row + '<td>' + results[resultIndex][rowIndex] + '</td>'
+        }
+        if (id === 'copy') {
+          row = row + '<td><button word="' + results[resultIndex][1] + '" class="add-word btn btn-success">Add Word</button></td>'
         }
         row = row + '</tr>'
         console.log(row)
@@ -59,6 +62,7 @@ function addQCChecks (data) {
   }
   validateStatus()
   addCopyButton()
+  addClickEvents()
 }
 
 function validateStatus () {
@@ -143,5 +147,23 @@ function addCopyButton () {
   clipboard.on('error', function (e) {
     console.error('Action:', e.action)
     console.error('Trigger:', e.trigger)
+  })
+}
+function addClickEvents () {
+  $('.add-word').click(function () {
+    let target = this
+    var word = {}
+    word.add = $(this).attr('word')
+    $(this).html('Adding')
+    $.ajax({
+      type: 'POST',
+      url: '/dictionary/add',
+      data: word,
+      success: function (data) {
+        $(target).addClass('disabled')
+        $(target).html('Added')
+      },
+      dataType: 'JSON'
+    })
   })
 }
