@@ -5,10 +5,11 @@ var jobid
 $('#crawl').click(function () {
   var url = $('#website').val()
   socket.emit('crawl', { url: url })
-  // $('#results .container').remove()
-  // var html = '<div id="results-container" class="container"><h2 class="page-title">Crawl Results</h2> <div class="row container"><a href="#" class="btn btn-primary g5-button-small" id="expand_all" data-toggle="collapse" data-target=".qc-checks" aria-expanded="false">Expand / Collapse All</a></div></div>'
-  // $('#results').append(html)
-  // $('#results-tab').addClass('disabled')
+  $('#results .container').remove()
+  var html = '<div class="container"><div class="row center"><h2 class="col">Results</h2></div><div class="row qc-checks"><div class="col-md-4"><div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical"></div></div><div class="col-md-8 urls tab-content"><div class="tab-content" id="v-pills-tabContent"></div> </div></div></div>'
+  $('#results').append(html)
+  $('#results-tab').addClass('disabled')
+
 })
 
 socket.on('enqueued', function (data) {
@@ -22,6 +23,7 @@ socket.on('qcDone', function (data) {
     console.log(data)
     $('#results-tab').removeClass('disabled')
     results.render(data)
+    $('#results-tab').click()
   }
 })
 socket.on('jobStart', function (data) {

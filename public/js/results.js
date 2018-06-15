@@ -33,15 +33,25 @@ function addQCChecks (data) {
     $('#v-pills-tabContent').append(table)
     // Add Rows to the Table
     for (let resultIndex = 0; resultIndex < results.length; resultIndex++) {
-      // Create a new Row
-      let row = '<tr>'
-      for (let rowIndex = 0; rowIndex < results[resultIndex].length; rowIndex++) {
-        row = row + '<td>' + results[resultIndex][rowIndex] + '</td>'
+      if (resultIndex === 0) {
+        // Create a new Row
+        let tableHead = '<tr>'
+        for (let rowIndex = 0; rowIndex < results[resultIndex].length; rowIndex++) {
+          tableHead = tableHead + '<th>' + results[resultIndex][rowIndex] + '</th>'
+        }
+        tableHead = tableHead + '</tr>'
+        $('#v-pills-' + id + ' table').append(tableHead)
+      } else {
+        // Create a new Row
+        let row = '<tr>'
+        for (let rowIndex = 0; rowIndex < results[resultIndex].length; rowIndex++) {
+          row = row + '<td>' + results[resultIndex][rowIndex] + '</td>'
+        }
+        row = row + '</tr>'
+        console.log(row)
+        console.log('#v-pills-' + id + ' table')
+        $('#v-pills-' + id + ' table').append(row)
       }
-      row = row + '</tr>'
-      console.log(row)
-      console.log('#v-pills-' + id + ' table')
-      $('#v-pills-' + id + ' table').append(row)
     }
     if (i === 1) {
       $('#v-pills-' + id + '-tab').click()
@@ -56,7 +66,7 @@ function validateStatus () {
   var ctaStatus = true
   var directionsStatus = true
   var pageSpeedStatus = true
-  let noIndexStatus = true 
+  let noIndexStatus = true
   $('#v-pills-ctas table tr td:nth-child(2)').each(function (i) {
     console.log($(this).text())
     let text = $(this).text()

@@ -13,38 +13,51 @@ async function crawl (io) {
       copy: {
         id: 'copy',
         name: 'Copy',
-        results: []
+        results: [
+          ['Page', 'Word']
+        ]
       },
       lazyLoad: {
         id: 'lazyLoad',
         name: 'LazyLoad',
-        results: []
+        results: [
+          ['Page', 'Image']
+        ]
       },
       grammar: {
         id: 'grammar',
         name: 'Grammar',
-        results: []
-
+        results: [
+          ['Page', 'Copy', 'Error']
+        ]
       },
       ctas: {
         id: 'ctas',
         name: 'CTAs',
-        results: []
+        results: [
+          ['Page', 'Link', 'Text']
+        ]
       },
       directions: {
         id: 'directions',
         name: 'Directions',
-        results: []
+        results: [
+          ['Page', 'Matched']
+        ]
       },
       pagespeed: {
         id: 'pagespeed',
         name: 'PageSpeed',
-        results: []
+        results: [
+          ['Test', 'Score']
+        ]
       },
       h1: {
         id: 'h1',
         name: 'Multiple H1s',
-        results: []
+        results: [
+          ['Page', 'H1']
+        ]
       },
       ga: {
         id: 'ga',
@@ -54,12 +67,12 @@ async function crawl (io) {
       alt: {
         id: 'alt',
         name: 'Alt Text',
-        results: []
+        results: [['Page', 'Image', 'SRC']]
       },
       noIndex: {
         id: 'noIndex',
         name: 'No Index',
-        results: []
+        results: [['Page', 'No-Index']]
       }
     },
     error: [],
@@ -76,6 +89,8 @@ async function crawl (io) {
   var directions
   var h1s
   var GA
+  var altText
+  var googlePageSpeed
 
   await job[0].update({ processing: true })
 
@@ -97,7 +112,8 @@ async function crawl (io) {
   })
   io.emit('jobStart', job[0])
   try {
-    crawlResults.qcChecks.pagespeed.results = await pageSpeed.checks(page, url)
+    googlePageSpeed = await pageSpeed.checks(page, url)
+    crawlResults.qcChecks.pagespeed.results.push(googlePageSpeed)
 
     // load the page
     await page.goto(url)
@@ -190,13 +206,6 @@ async function crawl (io) {
             }
           }
         }
-
-        // get all images alt text except for the divider image
-        lazyLoad = await page.$$eval('img:not(.divider-image)', images => {
-          // get the image url and the alt text for it
-          return images.map((img) => img.getAttribute('alt'))
-        })
-
         // get all images with lazyload enabled
         lazyLoad = await page.$$eval('img.lazy-load', images => {
           return images.map((img) => img.getAttribute('data-src'))
@@ -268,6 +277,22 @@ async function crawl (io) {
 
         // check the spelling on the site
         let spellingErrors = spell.check(copy, words, urls[l])
+
+        // get all images alt text except for the divider image
+        altText = await page.$$eval('img:not(.divider-image)', images => {
+          // get the image url and the alt text for it
+          return images.map((img) => {
+            return [
+              img.getAttribute('src'), img.getAttribute('alt')
+            ]
+          })
+        })
+        for (let i = 0; i < altText.length; i++) {
+          if (altText[i] === '') {
+            crawlResults.qcChecks.alt.results.push([urls[l], altText[i][0], altText[i][1]])
+          }
+        }
+
         crawlResults.qcChecks.copy.results = crawlResults.qcChecks.copy.results.concat(spellingErrors)
 
         crawlResults.qcChecks.lazyLoad.results = crawlResults.qcChecks.lazyLoad.results.concat(format(lazyLoad, urls[l]))
