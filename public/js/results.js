@@ -16,7 +16,7 @@ function addQCChecks (data) {
     // Create the QC Check Button HTML
     let h4 = '<h4>' + name + '</h4>'
     let span
-    if (data.qcChecks[qcCheck].results.length === 0) {
+    if (data.qcChecks[qcCheck].results.length <= 1) {
       span = '<span class="oi oi-check passed"></span>'
     } else {
       span = '<span class="oi oi-warning failed"></span>'
