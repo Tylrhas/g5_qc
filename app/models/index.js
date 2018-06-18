@@ -3,22 +3,39 @@ var fs = require("fs");
 var path = require("path");
 const Sequelize = require("sequelize");
 require('dotenv').config()
-const sequelize = new Sequelize(process.env.DATABASE, process.env.DATABASE_USERNAME, process.env.DATABASE_PASSWORD, {
-  host: process.env.DATABASE_HOST,
-  dialect: 'postgres',
-  dialectOptions: {
-    ssl: true
-  },
-  operatorsAliases: false,
+if (process.env.ENVIRONMENT === 'dev') {
+  var sequelize = new Sequelize(process.env.DATABASE, process.env.DATABASE_USERNAME, process.env.DATABASE_PASSWORD, {
+    host: process.env.DATABASE_HOST,
+    dialect: 'postgres',
+    operatorsAliases: false,
+  
+    pool: {
+      max: 1,
+      min: 0,
+      acquire: 30000,
+      idle: 10000
+    },
+  
+  });
+} else {
+  var sequelize = new Sequelize(process.env.DATABASE, process.env.DATABASE_USERNAME, process.env.DATABASE_PASSWORD, {
+    host: process.env.DATABASE_HOST,
+    dialect: 'postgres',
+    dialectOptions: {
+      ssl: true
+    },
+    operatorsAliases: false,
+  
+    pool: {
+      max: 1,
+      min: 0,
+      acquire: 30000,
+      idle: 10000
+    },
+  
+  });
+}
 
-  pool: {
-    max: 1,
-    min: 0,
-    acquire: 30000,
-    idle: 10000
-  },
-
-});
 var db = {};
 
 fs

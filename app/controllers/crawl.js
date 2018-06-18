@@ -1,133 +1,50 @@
 const puppeteer = require('puppeteer')
-var spell = require('./spell.js')
 const grammar = require('./grammar.js')
 const models = require('../models')
-var dictionary = require('../controllers/custom-dictionary.js')
-var pageSpeed = require('../controllers/pagespeed')
-// var directionsWidget = require('../controllers/directions.js')
 
-class QualityCheck {
-  constructor() {
-    this.qualityChecks = []
-    this.results = {}
-  }
-  add(name, qualityFunction, tableHeaders) {
-    this.qualityChecks.push([name, qualityFunction,tableHeaders])
-  }
-  run (pupeteerPage, url) {
-    // run each one of the quality checks
-    for (let i = 0; i < this.qualityChecks.length; i++) {
-      let checkResults = this.qualityChecks[i][1](pupeteerPage, url)
-      this.results[this.qualityChecks[i][0]].results.concat(checkResults)
-    }
-    this.qualityCheck(page)
-    // console.log(page)
-  }
-  init () {
-    for (let i = 0; i < this.qualityChecks.length; i++) {
-      // loop through all of the quality checks that have been added and initialize each one into the results object
-      this.results[this.qualityChecks[i][0]].id = this.qualityChecks[i][1].replace(' ', '_').toLowerCase()
-      this.results[this.qualityChecks[i][0]].name = this.qualityChecks[i][1]
-      this.results[this.qualityChecks[i][0]].results = this.qualityChecks[i][2]
-    }
-  }
+// Import all QC Checks
+var pageSpeed = require('../controllers/pagespeed.js')
+var structuredData = require('../controllers/structured-data.js')
+var privacyPolicy = require('./privacy-policy.js')
+var PublishDate = require('./publish-date.js')
+var googleAnalytics = require('./ga.js')
+var directionsWidget = require('../controllers/directions.js')
+var lazyLoad = require('./lazyload.js')
+var h1 = require('./h1.js')
+var copy = require('./copy.js')
+var ctas = require('./cta.js')
+var altText = require('./alt-text.js')
+// Import the Quality Check Class
+var QualityCheck = require('./qualityControlClass')
+// Create New QualityControl check
+let g5QualityControl = new QualityCheck()
 
-}
+// Add Global Checks
+g5QualityControl.addGlobal('Strutured Data', structuredData.check, ['Page', 'Word'])
+g5QualityControl.addGlobal('PageSpeed', pageSpeed.checks, ['Test', 'Score'])
+g5QualityControl.addGlobal('Publish Date', PublishDate.get, false)
+g5QualityControl.addGlobal('GA #', googleAnalytics.check, ['URL', 'GA #'])
+// Add app page checks
+g5QualityControl.add('Copy', copy.check, ['Page', 'Word'])
+g5QualityControl.add('LazyLoad', lazyLoad.check, ['Page', 'Image'])
+g5QualityControl.add('Grammar', grammar.check, ['Page', 'Copy', 'Error'])
+g5QualityControl.add('CTAs', ctas.check, ['Page', 'Link', 'Text'])
+g5QualityControl.add('Directions', directionsWidget.checkDirections, ['Page', 'Matched'])
+g5QualityControl.add('Multiple H1s', h1.check, ['Page', 'H1'])
+g5QualityControl.add('No Index', privacyPolicy.noIndex, ['Page', 'No-Index'])
+g5QualityControl.add('Alt Text', altText.check, ['Page', 'No-Index'])
 
-let g5QualityControl = new QualityCheck();
-
-g5QualityControl.add('Copy', spell.check, ['Page', 'Word'])
+g5QualityControl.init()
 
 async function crawl (io) {
-  // set empty results object for spell check results
-  var crawlResults = {
-    qcChecks: {
-      copy: {
-        id: 'copy',
-        name: 'Copy',
-        results: [
-          ['Page', 'Word']
-        ]
-      },
-      lazyLoad: {
-        id: 'lazyLoad',
-        name: 'LazyLoad',
-        results: [
-          ['Page', 'Image']
-        ]
-      },
-      grammar: {
-        id: 'grammar',
-        name: 'Grammar',
-        results: [
-          ['Page', 'Copy', 'Error']
-        ]
-      },
-      ctas: {
-        id: 'ctas',
-        name: 'CTAs',
-        results: [
-          ['Page', 'Link', 'Text']
-        ]
-      },
-      directions: {
-        id: 'directions',
-        name: 'Directions',
-        results: [
-          ['Page', 'Matched']
-        ]
-      },
-      pagespeed: {
-        id: 'pagespeed',
-        name: 'PageSpeed',
-        results: [
-          ['Test', 'Score']
-        ]
-      },
-      h1: {
-        id: 'h1',
-        name: 'Multiple H1s',
-        results: [
-          ['Page', 'H1']
-        ]
-      },
-      ga: {
-        id: 'ga',
-        name: 'GA #',
-        results: []
-      },
-      alt: {
-        id: 'alt',
-        name: 'Alt Text',
-        results: [['Page', 'Image', 'SRC']]
-      },
-      noIndex: {
-        id: 'noIndex',
-        name: 'No Index',
-        results: [['Page', 'No-Index']]
-      }
-    },
-    error: [],
-    global: {}
-  }
   var crawled = []
   var urls = []
   var job = await getNext()
   var url = job[0].url
-  var lazyLoad
-  var copy
-  var CTAs
   var l = 0
-  var directions
-  var h1s
-  var GA
-  var altText
-  var googlePageSpeed
 
   await job[0].update({ processing: true })
 
-  // Initilize the dictionary
-  var words = await dictionary.load()
   var args
   if (process.env.env === 'dev') {
     args = { headless: false }
@@ -144,56 +61,16 @@ async function crawl (io) {
   })
   io.emit('jobStart', job[0])
   try {
-    googlePageSpeed = await pageSpeed.checks(page, url)
-    crawlResults.qcChecks.pagespeed.results.push(googlePageSpeed)
-
     // load the page
     await page.goto(url)
-
     // scrape all of the URLs on the current page
     urls = await getLinks(page, urls, url)
-
-    // Global checks
-    const structuredDataWidget = await page.$$eval('.structured-data-widget', structuredDataWidgets => structuredDataWidgets.length)
-    console.log(structuredDataWidget)
-
-    crawlResults.global.structured_Data_Widget = {
-      result: null,
-      name: 'Structured Data',
-      id: 'structured_data'
-    }
-    if (structuredDataWidget === false) {
-      // structured data widget was found
-      crawlResults.structured_Data_Widget.result = false
-    } else {
-      // there is no structured data widget
-      crawlResults.global.structured_Data_Widget.result = true
-    }
-
-    // get the last published date
-    var publishDate = await page.$eval('body', body => {
-      return body.innerHTML.match(/<!-- Updated (.*) - CMS:.* -->/)[1]
-    })
-    crawlResults.global.publish_Date = {
-      result: publishDate,
-      name: 'Publish Date',
-      id: 'publish_date'
-    }
-    // End Global checks
-
-    GA = await page.evaluate(function () {
-      return window.dataLayer[0].G5_CLIENT_TRACKING_ID
-    })
-
-    if (GA !== undefined) {
-      // GA is set up
-      crawlResults.qcChecks.GA.results.push([url, GA])
-    }
-
-    console.log(GA)
+    // Run all of the Global Checks for the site
+    g5QualityControl.runGlobal()
+    // Push the page URL to the crawled array
     crawled.push(url)
   } catch (error) {
-    crawlResults.error.push(url)
+    g5QualityControl.error([url, error])
   }
   while (crawled.length < urls.length) {
     // do not crawl any urls with /# in them
@@ -203,131 +80,13 @@ async function crawl (io) {
       try {
         await page.goto(urls[l])
 
-        // Check if the slug is privacy-policy
-        var pageSlug = urls[l].substring(urls[l].lastIndexOf('/') + 1)
-        if (pageSlug === 'privacy-policy') {
-          var privacyPolicyNoIndex = page.$$eval('meta[name=robots]', noIndex => noIndex.length)
-          // Check if the URL is a G5static Heroku or G5dns link if so look for two no idexes in the code
-          if (urls[l].includes('g5static') || urls[l].includes('heroku') || urls[l].includes('g5dns')) {
-            // This is the privacy policy page look for no index twice to show it is enabled for staging
-            if (privacyPolicyNoIndex <= 1) {
-              // not set to no index
-              crawlResults.qcChecks.noIndex.results.push([urls[l], false])
-            } else {
-              // Is set to no index
-              crawlResults.qcChecks.noIndex.results.push([urls[l], true])
-            }
-          } else {
-            // it only needs to show up once
-            if (privacyPolicyNoIndex >= 1) {
-              crawlResults.qcChecks.noIndex.results.push([urls[l], true])
-            } else {
-              crawlResults.qcChecks.noIndex.results.push([urls[l], false])
-            }
-          }
-        }
-        // get all images with lazyload enabled
-        lazyLoad = await page.$$eval('img.lazy-load', images => {
-          return images.map((img) => img.getAttribute('data-src'))
-        })
-
-        // Check for Multiple H1s on a single page
-        h1s = await page.$$eval('h1', h1s => {
-          return h1s.map((h1) => h1.textContent)
-        })
-
-        if (h1s.length > 1) {
-          // We have more than 1 h1 per page
-          for (let i = 0; i < h1s.length; i++) {
-            crawlResults.qcChecks.h1.results.push([urls[l], h1s[i]])
-          }
-        }
-
-        // scrape the copy on the site
-        copy = await page.$$eval('.html-content p , h1, h2, h3, h4, h5, h6, .html-content li ', paragraphs => {
-          return paragraphs.map((paragraph) => paragraph.textContent)
-        })
-
-        directions = await page.$$eval('.directions.widget', directionsWidgets => directionsWidgets.length)
-
-        if (directions > 0) {
-          // The Directions widget is on this page
-          // await directionsWidget.checkDirections(page)
-          var startingAddress = process.env.STARTING_ADDRESS
-          console.log(startingAddress)
-          await page.focus('.directions-start')
-          await page.type('.directions-start', startingAddress)
-          await page.click('.directions-submit')
-          // await page.waitForNavigation({ waitUntil: 'networkidle0' })
-          await page.waitForSelector('.adp-directions', { timeout: 2000 })
-
-          var endingAddresses = await page.$$eval('.adp-placemark .adp-text', addresses => {
-            return addresses.map((address) => address.textContent)
-          })
-          console.log(endingAddresses)
-          if (endingAddresses[1] !== undefined) {
-            var footerAddress = await page.$$eval('.adr', footerAddresses => {
-              return footerAddresses.map((footerAddress) => footerAddress.innerText)
-            })
-            footerAddress = footerAddress[0].replace(/\r?\n|\r/g, '').trim()
-            endingAddresses = endingAddresses[1]
-            endingAddresses = endingAddresses.substr(0, endingAddresses.lastIndexOf(','))
-            console.log(endingAddresses)
-            endingAddresses = endingAddresses.trim()
-            // console.log(footerAddress)
-            console.log(endingAddresses + ' : ' + footerAddress)
-            if (endingAddresses === footerAddress) {
-              crawlResults.qcChecks.directions.results.push([urls[l], true])
-            } else {
-              crawlResults.qcChecks.directions.results.push([urls[l], false])
-            }
-          } else {
-            crawlResults.qcChecks.directions.results.push([urls[l], false])
-          }
-        }
-
-        CTAs = await page.$$eval('.cta-item a', ctas => {
-          return ctas.map((cta) => {
-            return {
-              href: cta.getAttribute('href'),
-              text: cta.textContent
-            }
-          })
-        })
-
-        // check the spelling on the site
-        let spellingErrors = spell.check(copy, words, urls[l])
-
-        // get all images alt text except for the divider image
-        altText = await page.$$eval('img:not(.divider-image)', images => {
-          // get the image url and the alt text for it
-          return images.map((img) => {
-            return [
-              img.getAttribute('src'), img.getAttribute('alt')
-            ]
-          })
-        })
-        for (let i = 0; i < altText.length; i++) {
-          if (altText[i] === '') {
-            crawlResults.qcChecks.alt.results.push([urls[l], altText[i][0], altText[i][1]])
-          }
-        }
-
-        crawlResults.qcChecks.copy.results = crawlResults.qcChecks.copy.results.concat(spellingErrors)
-
-        crawlResults.qcChecks.lazyLoad.results = crawlResults.qcChecks.lazyLoad.results.concat(format(lazyLoad, urls[l]))
-
-        // grammar Check the Copy
-        crawlResults.qcChecks.grammar.results = crawlResults.qcChecks.grammar.results.concat(grammar.check(copy, urls[l]))
-
-        // CTA Check
-        crawlResults.qcChecks.ctas.results = crawlResults.qcChecks.ctas.results.concat(formatObject(CTAs, urls[l]))
+        g5QualityControl.run(page, urls[l])
 
         // get links on the page
         urls = await getLinks(page, urls, url)
       } catch (error) {
         // add this page to error'd pages
-        crawlResults.error.push([urls[l], error])
+        g5QualityControl.error([urls[l], error])
       }
     }
     // push the urls to the crawled array
@@ -336,10 +95,11 @@ async function crawl (io) {
     l++
   }
   browser.close()
-
+  // reset the results
+  g5QualityControl.clear()
   // add job id to the results
-  crawlResults.jobID = job[0].id
-  io.emit('qcDone', crawlResults)
+  g5QualityControl.addJob(job[0].id)
+  io.emit('qcDone', g5QualityControl.results())
   await job[0].destroy()
   var jobQueue = await models.jobQueue.count()
   if (jobQueue > 0) {
@@ -369,30 +129,6 @@ async function getLinks (page, urls, url) {
 
 function getNext () {
   return models.jobQueue.findAll({ limit: 1 })
-}
-
-function format (array, page) {
-  console.log(array)
-  var result = []
-  for (let i = 0; i < array.length; i++) {
-    result.push([page, array[i]])
-  }
-  console.log(result)
-  return result
-}
-function formatObject (array, page) {
-  console.log(array)
-  var result = []
-  for (let i = 0; i < array.length; i++) {
-    var objectPage = [page]
-    for (let i2 = 0; i2 < Object.keys(array[i]).length; i2++) {
-      let key = Object.keys(array[i])[i2]
-      objectPage.push(array[i][key])
-    }
-    result.push(objectPage)
-  }
-  console.log(result)
-  return result
 }
 
 // export Module
