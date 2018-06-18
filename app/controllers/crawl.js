@@ -6,6 +6,38 @@ var dictionary = require('../controllers/custom-dictionary.js')
 var pageSpeed = require('../controllers/pagespeed')
 // var directionsWidget = require('../controllers/directions.js')
 
+class QualityCheck {
+  constructor() {
+    this.qualityChecks = []
+    this.results = {}
+  }
+  add(name, qualityFunction, tableHeaders) {
+    this.qualityChecks.push([name, qualityFunction,tableHeaders])
+  }
+  run (pupeteerPage, url) {
+    // run each one of the quality checks
+    for (let i = 0; i < this.qualityChecks.length; i++) {
+      let checkResults = this.qualityChecks[i][1](pupeteerPage, url)
+      this.results[this.qualityChecks[i][0]].results.concat(checkResults)
+    }
+    this.qualityCheck(page)
+    // console.log(page)
+  }
+  init () {
+    for (let i = 0; i < this.qualityChecks.length; i++) {
+      // loop through all of the quality checks that have been added and initialize each one into the results object
+      this.results[this.qualityChecks[i][0]].id = this.qualityChecks[i][1].replace(' ', '_').toLowerCase()
+      this.results[this.qualityChecks[i][0]].name = this.qualityChecks[i][1]
+      this.results[this.qualityChecks[i][0]].results = this.qualityChecks[i][2]
+    }
+  }
+
+}
+
+let g5QualityControl = new QualityCheck();
+
+g5QualityControl.add('Copy', spell.check, ['Page', 'Word'])
+
 async function crawl (io) {
   // set empty results object for spell check results
   var crawlResults = {
