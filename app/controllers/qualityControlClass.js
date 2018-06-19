@@ -49,10 +49,15 @@ class QualityCheck {
   }
   run (pupeteerPage, url) {
     // run each one of the quality checks
+    var functions = []
     for (let i = 0; i < this.qualityChecks.length; i++) {
-      let checkResults = this.qualityChecks[i][1](pupeteerPage, url)
-      this.results.qcChecks[this.qualityChecks[i][0]].results.push(checkResults)
+      var checksName = this.qualityChecks[i][0]
+      functions.push(this.qualityChecks[i][1](pupeteerPage, url).then(results => {
+        return {checksName, results}
+      }))
+      // this.results.qcChecks[this.qualityChecks[i][0]].results.push(checkResults)
     }
+    return Promise.all(functions)
   }
   addGlobal (name, qualityFunction, tableHeaders) {
     this.globalQualityChecks.push([name, qualityFunction, tableHeaders])
@@ -76,11 +81,6 @@ class QualityCheck {
       this.results.qcChecks.error = []
     }
     this.results.qcChecks.error.push(pageError)
-  }
-  clear () {
-    this.qualityChecks = []
-    this.globalQualityChecks = []
-    this.results = {}
   }
   addJob (jobId) {
     this.results.jobId = jobId

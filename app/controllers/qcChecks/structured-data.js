@@ -1,4 +1,4 @@
-async function check () {
+async function check (page, url) {
   const structuredDataWidget = await page.$$eval('.structured-data-widget', structuredDataWidgets => structuredDataWidgets.length)
   console.log(structuredDataWidget)
 

@@ -1,24 +1,23 @@
 const puppeteer = require('puppeteer')
-const grammar = require('./grammar.js')
+const grammar = require('./qcChecks/grammar')
 const models = require('../models')
 
 // Import all QC Checks
-var pageSpeed = require('../controllers/pagespeed.js')
-var structuredData = require('../controllers/structured-data.js')
-var privacyPolicy = require('./privacy-policy.js')
-var PublishDate = require('./publish-date.js')
-var googleAnalytics = require('./ga.js')
-var directionsWidget = require('../controllers/directions.js')
-var lazyLoad = require('./lazyload.js')
-var h1 = require('./h1.js')
-var copy = require('./copy.js')
-var ctas = require('./cta.js')
-var altText = require('./alt-text.js')
+var pageSpeed = require('../controllers/qcChecks/pagespeed')
+var structuredData = require('../controllers/qcChecks/structured-data')
+var privacyPolicy = require('./qcChecks/privacy-policy')
+var PublishDate = require('./qcChecks/publish-date')
+var googleAnalytics = require('./qcChecks/ga')
+var directionsWidget = require('../controllers/qcChecks/directions')
+var lazyLoad = require('./qcChecks/lazyload')
+var h1 = require('./qcChecks/h1')
+var copy = require('./qcChecks/copy')
+var ctas = require('./qcChecks/cta')
+var altText = require('./qcChecks/alt-text')
 // Import the Quality Check Class
 var QualityCheck = require('./qualityControlClass')
 // Create New QualityControl check
-let g5QualityControl = new QualityCheck()
-
+var g5QualityControl = new QualityCheck()
 // Add Global Checks
 g5QualityControl.addGlobal('Strutured Data', structuredData.check, ['Page', 'Word'])
 g5QualityControl.addGlobal('PageSpeed', pageSpeed.checks, ['Test', 'Score'])
@@ -34,9 +33,9 @@ g5QualityControl.add('Multiple H1s', h1.check, ['Page', 'H1'])
 g5QualityControl.add('No Index', privacyPolicy.noIndex, ['Page', 'No-Index'])
 g5QualityControl.add('Alt Text', altText.check, ['Page', 'No-Index'])
 
-g5QualityControl.init()
-
 async function crawl (io) {
+  g5QualityControl.init()
+
   var crawled = []
   var urls = []
   var job = await getNext()
@@ -80,7 +79,10 @@ async function crawl (io) {
       try {
         await page.goto(urls[l])
 
-        g5QualityControl.run(page, urls[l])
+        g5QualityControl.run(page, urls[l]).then(results => {
+          // results QC are here
+          console.log(results)
+        })
 
         // get links on the page
         urls = await getLinks(page, urls, url)
@@ -95,8 +97,6 @@ async function crawl (io) {
     l++
   }
   browser.close()
-  // reset the results
-  g5QualityControl.clear()
   // add job id to the results
   g5QualityControl.addJob(job[0].id)
   io.emit('qcDone', g5QualityControl.results())

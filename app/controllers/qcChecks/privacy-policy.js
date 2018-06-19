@@ -1,5 +1,4 @@
 async function noIndex (page, url) {
-
   // Check if the slug is privacy-policy
   var pageSlug = url.substring(url.lastIndexOf('/') + 1)
   if (pageSlug === 'privacy-policy') {
