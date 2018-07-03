@@ -2,14 +2,19 @@ class QualityCheck {
   constructor () {
     this.qualityChecks = []
     this.globalQualityChecks = []
-    this.results = {}
+    this.results = {
+      qcChecks: {},
+      global: {},
+      error: {}
+    }
+    this.homepage = ''
   }
   init () {
     for (let i = 0; i < this.qualityChecks.length; i++) {
       if (i === 0) {
         this.results.qcChecks = {}
       }
-      let qaualityCheck = this.qualityChecks[i]
+      let qualityCheck = this.qualityChecks[i]
       let qualityCheckName = this.qualityChecks[i][0]
       let qualityCheckID = this.qualityChecks[i][0].replace(' ', '_').toLowerCase()
       // Initalize the object
@@ -17,10 +22,10 @@ class QualityCheck {
       // loop through all of the quality checks that have been added and initialize each one into the results object
       this.results.qcChecks[qualityCheckID].id = this.qualityChecks[i][0].replace(' ', '_').toLowerCase()
       this.results.qcChecks[qualityCheckID].name = qualityCheckName
-      this.results.qcChecks[qualityCheckID].results = []
+      this.results.qcChecks[qualityCheckID].result = []
       // If there are row headers add them
-      if (qaualityCheck[2]) {
-        this.results.qcChecks[qualityCheckID].results.push(qaualityCheck[2])
+      if (qualityCheck[2]) {
+        this.results.qcChecks[qualityCheckID].result.push(qualityCheck[2])
       }
     }
     // Init Global Checks
@@ -28,7 +33,7 @@ class QualityCheck {
       if (i === 0) {
         this.results.global = {}
       }
-      let qaualityCheck = this.globalQualityChecks[i]
+      let qualityCheck = this.globalQualityChecks[i]
       let qualityCheckName = this.globalQualityChecks[i][0]
       let qualityCheckID = this.globalQualityChecks[i][0].replace(' ', '_').toLowerCase()
       // Initalize the object
@@ -36,10 +41,10 @@ class QualityCheck {
       // loop through all of the quality checks that have been added and initialize each one into the results object
       this.results.global[qualityCheckID].id = qualityCheckID
       this.results.global[qualityCheckID].name = qualityCheckName
-      this.results.global[qualityCheckID].results = []
+      this.results.global[qualityCheckID].result = []
       // If there are row headers add them
-      if (qaualityCheck[2]) {
-        this.results.global[qualityCheckID].results.push(qaualityCheck[2])
+      if (qualityCheck[2]) {
+        this.results.global[qualityCheckID].result.push(qualityCheck[2])
       }
     }
   }
@@ -53,9 +58,8 @@ class QualityCheck {
     for (let i = 0; i < this.qualityChecks.length; i++) {
       var checksName = this.qualityChecks[i][0]
       functions.push(this.qualityChecks[i][1](pupeteerPage, url).then(results => {
-        return {checksName, results}
+        return { checksName, results }
       }))
-      // this.results.qcChecks[this.qualityChecks[i][0]].results.push(checkResults)
     }
     return Promise.all(functions)
   }
@@ -65,22 +69,36 @@ class QualityCheck {
   }
   runGlobal (pupeteerPage, url) {
     // run each one of the quality checks
-    for (let i = 0; i < this.qualityChecks.length; i++) {
-      let checkResults = this.qualityChecks[i][1](pupeteerPage, url)
-      this.results.qcChecks[this.qualityChecks[i][0]].results.push(checkResults)
+    var globalfunctions = []
+    for (let i = 0; i < this.globalQualityChecks.length; i++) {
+      var globalChecksName = this.globalQualityChecks[i][0]
+      globalfunctions.push(this.globalQualityChecks[i][1](pupeteerPage, url).then(results => {
+        return { globalChecksName, results }
+      }))
+    }
+    return Promise.all(globalfunctions)
+  }
+  get qcResults () {
+    return this.results
+  }
+  set qcResults (value) {
+    // console.log(value.globalChecksName.replace(' ', '_').toLowerCase())
+    if (Object.keys(value)[0] === 'globalChecksName') {
+      let id = value.globalChecksName.replace(' ', '_').toLowerCase()
+      // check if this objects exists
+      this.results.global[id].result.push(value.results)
+    } else {
+      let id = value.checksName.replace(' ', '_').toLowerCase()
+      for (let i = 0; i < value.results.length; i++) {
+        this.results.qcChecks[id].result.push(value.results[i])
+      }
     }
   }
-  results () {
-    if (Object.keys(this.results.qcChecks).length) {
-      return undefined
-    }
-    return this.results.qcChecks
-  }
-  error (pageError) {
+  set error (pageError) {
     if (!('error' in this.results.qcChecks)) {
-      this.results.qcChecks.error = []
+      this.results.error = []
     }
-    this.results.qcChecks.error.push(pageError)
+    this.results.error.push(pageError)
   }
   addJob (jobId) {
     this.results.jobId = jobId

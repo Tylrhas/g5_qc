@@ -2,37 +2,41 @@ async function checkDirections (page, url) {
   let directions = await page.$$eval('.directions.widget', directionsWidgets => directionsWidgets.length)
 
   if (directions > 0) {
-    // The Directions widget is on this page
-    var startingAddress = process.env.STARTING_ADDRESS
-    console.log(startingAddress)
-    await page.focus('.directions-start')
-    await page.type('.directions-start', startingAddress)
-    await page.click('.directions-submit')
-    // await page.waitForNavigation({ waitUntil: 'networkidle0' })
-    await page.waitForSelector('.adp-directions', { timeout: 2000 })
+    try {
+      // The Directions widget is on this page
+      var startingAddress = process.env.STARTING_ADDRESS
+      console.log(startingAddress)
+      await page.focus('.directions-start')
+      await page.type('.directions-start', startingAddress)
+      await page.click('.directions.widget input[type="submit"]')
+      // await page.waitForNavigation({ waitUntil: 'networkidle0' })
+      await page.waitForSelector('.adp-directions', { timeout: 2000 })
 
-    var endingAddresses = await page.$$eval('.adp-placemark .adp-text', addresses => {
-      return addresses.map((address) => address.textContent)
-    })
-    console.log(endingAddresses)
-    if (endingAddresses[1] !== undefined) {
-      var footerAddress = await page.$$eval('.adr', footerAddresses => {
-        return footerAddresses.map((footerAddress) => footerAddress.innerText)
+      var endingAddresses = await page.$$eval('.adp-placemark .adp-text', addresses => {
+        return addresses.map((address) => address.textContent)
       })
-      footerAddress = footerAddress[0].replace(/\r?\n|\r/g, '').trim()
-      endingAddresses = endingAddresses[1]
-      endingAddresses = endingAddresses.substr(0, endingAddresses.lastIndexOf(','))
       console.log(endingAddresses)
-      endingAddresses = endingAddresses.trim()
-      // console.log(footerAddress)
-      console.log(endingAddresses + ' : ' + footerAddress)
-      if (endingAddresses === footerAddress) {
-        return [url, true]
+      if (endingAddresses[1] !== undefined) {
+        var footerAddress = await page.$$eval('.adr', footerAddresses => {
+          return footerAddresses.map((footerAddress) => footerAddress.innerText)
+        })
+        footerAddress = footerAddress[0].replace(/\r?\n|\r/g, '').trim()
+        endingAddresses = endingAddresses[1]
+        endingAddresses = endingAddresses.substr(0, endingAddresses.lastIndexOf(','))
+        console.log(endingAddresses)
+        endingAddresses = endingAddresses.trim()
+        // console.log(footerAddress)
+        console.log(endingAddresses + ' : ' + footerAddress)
+        if (endingAddresses === footerAddress) {
+          return [url, true]
+        } else {
+          return [url, false]
+        }
       } else {
         return [url, false]
       }
-    } else {
-      return [url, false]
+    } catch (error) {
+      return [url, error]
     }
   }
 }
