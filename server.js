@@ -79,14 +79,6 @@ app.get('/', checkAuthentication, function (req, res) {
   })
 })
 
-app.get('/dictionary', checkAuthentication, function (req, res) {
-  // load up the Custom Dictionary
-  var words = dictionary.load()
-  words.then(function (words) {
-    res.json(words)
-  })
-})
-
 server.listen(port)
 
 io.on('connection', function (socket) {
