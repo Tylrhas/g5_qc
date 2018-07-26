@@ -71,9 +71,11 @@ app.get('/g5_auth/users/auth/g5/callback',
   })
 
 app.get('/', checkAuthentication, function (req, res) {
-  models.jobQueue.findAll().then(results => {
-    // Successful authentication, render home.
-    res.render('pages/index', { user: req.user, jobs: results })
+  let jobs = models.jobQueue.findAll()
+  let words = dictionary.load()
+  // Successful authentication, render home.
+  Promise.all([jobs, words]).then(results => {
+    res.render('pages/index', { user: req.user, jobs: results[0], dictionary: results[0] })
   })
 })
 
@@ -82,43 +84,6 @@ app.get('/dictionary', checkAuthentication, function (req, res) {
   var words = dictionary.load()
   words.then(function (words) {
     res.json(words)
-  })
-})
-
-app.post('/dictionary/add', function (req, res) {
-  console.log(req.body)
-  // add word to the custom dictionary
-  dictionary.add(req.body.add).then(function (newDictionary) {
-    res.json(newDictionary)
-  })
-})
-
-app.post('/dictionary/remove', function (req, res) {
-  // add word to the custom dictionary
-  dictionary.remove(req.body.remove).then(function (newDictionary) {
-    res.json(newDictionary)
-  })
-})
-
-app.post('/jobs/remove', function (req, res) {
-  // add word to the custom dictionary
-  models.jobQueue.destroy({
-    where: {
-      id: req.body.remove
-    }
-  }).then(function () {
-    res.status(200)
-    var jobQueue = models.jobQueue.findOne({
-      where: {
-        processing: true
-      }
-    })
-    jobQueue.then(function (jobQueue) {
-      if (!jobQueue) {
-        console.log('here we go!')
-        crawl.crawl(io)
-      }
-    })
   })
 })
 
@@ -142,6 +107,12 @@ io.on('connection', function (socket) {
       })
     })
   })
+
+  // Create on for create word
+
+  // Create on for remove word
+
+  // Create on for Remove Job
 })
 
 // Sync Database
