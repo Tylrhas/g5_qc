@@ -21,7 +21,6 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 // force SSL Certs
-
 if (process.env.ENVIRONMENT !== 'dev') {
   app.use(function (req, res, next) {
     if ((req.get('X-Forwarded-Proto') !== 'https')) {
@@ -99,12 +98,23 @@ io.on('connection', function (socket) {
       })
     })
   })
+  socket.on('createWord', function (data) {
+    // Create on for create word
+    dictionary.add(data.word).then(() => {
+      io.emit('wordAdded', data.word)
+    })
+  })
 
-  // Create on for create word
+  socket.on('removeWord', function (data) {
+    // Create on for remove word
+    dictionary.remove(data.word).then(() => {
+      io.emit('wordRemoved', data.word)
+    })
+  })
 
-  // Create on for remove word
-
-  // Create on for Remove Job
+  socket.on('removeJob', function (data) {
+    // Create on for Remove Job
+  })
 })
 
 // Sync Database

@@ -15,11 +15,11 @@ function addGlobalChecks (data) {
 
 function addButton (globalCheck) {
   var id = globalCheck.id
+  var h4 = '<h4>' + globalCheck.name + '</h4>'
   if (typeof (globalCheck.result) === typeof (true)) {
     // This global check is a boolean
     // Create the QC Check Button HTML
     console.log(globalCheck.name)
-    var h4 = '<h4>' + globalCheck.name + '</h4>'
     var span
     if (globalCheck.result === true) {
       span = '<span class="oi oi-check passed"></span>'
@@ -33,7 +33,7 @@ function addButton (globalCheck) {
     let publishDate = globalCheck.result
     $('#results>.container>.row.center').after(' <div class="row"><h4 class="center col">' + globalCheck.name + ' : ' + publishDate + '</h4></div>')
   } else {
-    if (globalCheck.result !== null) {
+    if (globalCheck.result.length === 0) {
       span = '<span class="oi oi-check passed"></span>'
     } else {
       span = '<span class="oi oi-warning failed"></span>'

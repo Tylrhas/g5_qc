@@ -1,9 +1,9 @@
-async function getDate (page, url) {
+async function getDate (page, url, globalChecksName) {
   // get the last published date
-  var publishDate = await page.$eval('body', body => {
+  var results = await page.$eval('body', body => {
     return body.innerHTML.match(/<!-- Updated (.*) - CMS:.* -->/)[1]
   })
-  return publishDate
+  return { globalChecksName, results }
 }
 
 module.exports.get = getDate

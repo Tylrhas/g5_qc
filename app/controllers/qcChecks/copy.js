@@ -1,7 +1,7 @@
 var spell = require('../spell.js')
 var dictionary = require('../custom-dictionary.js')
 
-async function check (page, url) {
+async function check (page, url, checkName) {
   // Initilize the dictionary
   var words = await dictionary.load()
   // scrape the copy on the site
@@ -10,8 +10,8 @@ async function check (page, url) {
   })
 
   // check the spelling on the site
-  let spellingErrors = spell.check(copy, words, url)
-  return spellingErrors
+  let results = spell.check(copy, words, url)
+  return {checkName, results}
 }
 
 module.exports.check = check

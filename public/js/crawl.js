@@ -19,7 +19,9 @@ socket.on('enqueued', function (data) {
 })
 socket.on('qcDone', function (data) {
   // check if completed job is the correct job
-  if (jobid === data.jobID) {
+  console.log(jobid)
+  console.log(data.jobId)
+  if (jobid === data.jobId) {
     console.log(data)
     $('#results-tab').removeClass('disabled')
     results.render(data)

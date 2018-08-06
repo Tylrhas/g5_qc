@@ -1,11 +1,11 @@
 const rousseau = require('rousseau')
 // turn off passive voice and readability
-async function grammarCheck (page, url) {
+async function grammarCheck (page, url, checkName) {
   let copy = await page.$$eval('.html-content p , h1, h2, h3, h4, h5, h6, .html-content li ', paragraphs => {
     return paragraphs.map((paragraph) => paragraph.textContent)
   })
 
-  var grammar = []
+  var results = []
 
   // break array into groups of copy
   for (let i = 0; i < copy.length; i++) {
@@ -19,22 +19,23 @@ async function grammarCheck (page, url) {
         adverbs: false,
         weasel: false
       }
-    }, function (error, results) {
+    }, function (error, rousseauResults) {
       if (error) {
         console.log(error)
       } else {
-        console.log(results)
-        for (let i = 0; i < results.length; i++) {
+        console.log(rousseauResults)
+        for (let i = 0; i < rousseauResults.length; i++) {
           var result = []
           result.push(url)
-          result.push(results[i].value)
-          result.push(results[i].message)
-          grammar.push(result)
+          result.push(rousseauResults[i].value)
+          result.push(rousseauResults[i].message)
+          results.push(result)
         }
       }
     })
   }
-  return grammar
+
+  return {checkName, results}
 }
 
 module.exports.check = grammarCheck

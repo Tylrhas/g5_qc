@@ -1,79 +1,56 @@
 const puppeteer = require('puppeteer')
-const grammar = require('./qcChecks/grammar')
 const models = require('../models')
+var g5QualityControl = require('../config/qcChecks')
 
-// Import all QC Checks
-var pageSpeed = require('./qcChecks/pagespeed')
-var structuredData = require('./qcChecks/structured-data')
-var privacyPolicy = require('./qcChecks/privacy-policy')
-var PublishDate = require('./qcChecks/publish-date')
-var googleAnalytics = require('./qcChecks/ga')
-var directionsWidget = require('./qcChecks/directions')
-var lazyLoad = require('./qcChecks/lazyload')
-var h1 = require('./qcChecks/h1')
-var copy = require('./qcChecks/copy')
-var ctas = require('./qcChecks/cta')
-var altText = require('./qcChecks/alt-text')
-// Import the Quality Check Class
-var QualityCheck = require('./qualityControlClass')
-// Create New QualityControl check
-var g5QualityControl = new QualityCheck()
-// Add Global Checks
-g5QualityControl.addGlobal('Strutured Data', structuredData.check, ['Page', 'Structured Data'])
-// g5QualityControl.addGlobal('PageSpeed', pageSpeed.checks, ['Test', 'Score'])
-g5QualityControl.addGlobal('Publish Date', PublishDate.get, false)
-g5QualityControl.addGlobal('GA #', googleAnalytics.check, ['URL', 'GA #'])
-// Add app page checks
-g5QualityControl.add('Copy', copy.check, ['Page', 'Word'])
-g5QualityControl.add('LazyLoad', lazyLoad.check, ['Page', 'Image'])
-g5QualityControl.add('Grammar', grammar.check, ['Page', 'Copy', 'Error'])
-g5QualityControl.add('CTAs', ctas.check, ['Page', 'Link', 'Text'])
-g5QualityControl.add('Directions', directionsWidget.checkDirections, ['Page', 'Matched'])
-// g5QualityControl.add('Multiple H1s', h1.check, ['Page', 'H1'])
-g5QualityControl.add('No Index', privacyPolicy.noIndex, ['Page', 'No-Index'])
-g5QualityControl.add('Alt Text', altText.check, ['Page', 'No-Index'])
 
 async function crawl (io) {
-  g5QualityControl.init()
-
   var crawled = []
   var urls = []
   var job = await getNext()
   var url = job[0].url
   // define the homepage URL
   g5QualityControl.homepage = url
+  // initialize the QC checks
+  g5QualityControl.init()
   await job[0].update({ processing: true })
 
   var args
-  if (process.env.env === 'dev') {
+  if (process.env.ENVIRONMENT === 'dev') {
     args = { headless: false }
   } else {
     args = { args: ['--no-sandbox', '--disable-setuid-sandbox'] }
   }
-
   // initilize the browser
-  const browser = await puppeteer.launch(args)
-  const page = await browser.newPage()
-
-  page.on('error', (error) => {
-    console.log('Page Error:', error)
-  })
-  io.emit('jobStart', job[0])
-  try {
-    // load the page
-    await page.goto(url)
-    // scrape all of the URLs on the current page
-    urls = await getLinks(page, urls, url, crawled)
-    // Run all of the Global Checks for the site
-    g5QualityControl.runGlobal(page, url).then(results => {
-      // Push Results to array
-      g5QualityControl.qcResults = results[0]
-      // Run the tests for the pages
-      qcPage(page, url, crawled, browser, urls, io, job)
+  puppeteer.launch(args).then(browser => {
+    // Create a new tab
+    browser.newPage().then(page => {
+      page.on('error', (error) => {
+        console.log('Page Error:', error)
+      })
+      io.emit('jobStart', job[0])
+      try {
+        // load the page
+        page.goto(url).then(naviation => {
+          // scrape all of the URLs on the current page
+          getLinks(page, urls, url, crawled).then(urls => {
+            // Run all of the Global Checks for the site
+            g5QualityControl.runGlobal(page, url).then(results => {
+              // Push Results to array
+              g5QualityControl.qcResults = results
+              g5QualityControl.runExternal(page, url).then(results => {
+                // Push Results to array
+                g5QualityControl.qcResults = results
+                // Run the tests for the pages
+                qcPage(page, url, crawled, browser, urls, io, job)
+              })
+            })
+          })
+        })
+      } catch (error) {
+        g5QualityControl.error = [url, error]
+      }
     })
-  } catch (error) {
-    g5QualityControl.error = [url, error]
-  }
+  })
 }
 async function getLinks (page, urls, url, crawled) {
   // scrape all ancors on the page
@@ -89,7 +66,7 @@ async function getLinks (page, urls, url, crawled) {
   // remove duplicates, urls of a different domains and phone numbers
   let uniqueArray = []
   for (let i = 0; i < allAnchors.length; i++) {
-    if (uniqueArray.indexOf(allAnchors[i]) === -1 && allAnchors[i].includes(g5QualityControl.homepage) === true && crawled.indexOf(allAnchors[i].replace(/\/$/, '')) === -1) {
+    if (uniqueArray.indexOf(allAnchors[i]) === -1 && allAnchors[i].includes(g5QualityControl.homepage) === true && crawled.indexOf(allAnchors[i].replace(/\/$/, '')) === -1 && allAnchors[i].includes('google.com') === false) {
       // push the URL without the trailing /
       uniqueArray.push(allAnchors[i].replace(/\/$/, ''))
     }
@@ -103,10 +80,9 @@ function getNext () {
 
 function nextPage (crawled, urls, page, browser, io, job) {
   if (urls.length > 0) {
-    let url = urls.pop()
-    page.goto(url).then(naviation => {
-      console.log(page)
-      return qcPage(page, url, crawled, browser, urls, io, job)
+    var newPage = urls.pop()
+    page.goto(newPage).then(naviation => {
+      return qcPage(page, newPage, crawled, browser, urls, io, job)
     })
   } else {
     browser.close()
@@ -123,7 +99,7 @@ function nextPage (crawled, urls, page, browser, io, job) {
 
 function qcPage (page, url, crawled, browser, urls, io, job) {
   g5QualityControl.run(page, url).then(results => {
-    g5QualityControl.qcResults = results[0]
+    g5QualityControl.qcResults = results
     // push the urls to the crawled array
     crawled.push(url)
     // get links on the page

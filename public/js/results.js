@@ -11,12 +11,12 @@ function addQCChecks (data) {
     let qcCheck = Object.keys(data.qcChecks)[i]
     let id = data.qcChecks[qcCheck].id
     let name = data.qcChecks[qcCheck].name
-    let results = data.qcChecks[qcCheck].results
+    let results = data.qcChecks[qcCheck].result
 
     // Create the QC Check Button HTML
     let h4 = '<h4>' + name + '</h4>'
     let span
-    if (data.qcChecks[qcCheck].results.length <= 1) {
+    if (data.qcChecks[qcCheck].result.length <= 1) {
       span = '<span class="oi oi-check passed"></span>'
     } else {
       span = '<span class="oi oi-warning failed"></span>'
