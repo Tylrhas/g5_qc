@@ -1,17 +1,17 @@
 
 // Import all QC Checks
-var pageSpeed = require('../controllers/qcChecks/pagespeed')
-var structuredData = require('../controllers/qcChecks/structured-data')
-var privacyPolicy = require('../controllers/qcChecks/privacy-policy')
-var PublishDate = require('../controllers/qcChecks/publish-date')
-var googleAnalytics = require('../controllers/qcChecks/ga')
-var directionsWidget = require('../controllers/qcChecks/directions')
-var lazyLoad = require('../controllers/qcChecks/lazyload')
-var h1 = require('../controllers/qcChecks/h1')
-var copy = require('../controllers/qcChecks/copy')
-var ctas = require('../controllers/qcChecks/cta')
-var altText = require('../controllers/qcChecks/alt-text')
-const grammar = require('../controllers/qcChecks/grammar')
+var pageSpeed = require('../lib/qcChecks/pagespeed')
+var structuredData = require('../lib/qcChecks/structured-data')
+var privacyPolicy = require('../lib/qcChecks/privacy-policy')
+var PublishDate = require('../lib/qcChecks/publish-date')
+var googleAnalytics = require('../lib/qcChecks/ga')
+var directionsWidget = require('../lib/qcChecks/directions')
+var lazyLoad = require('../lib/qcChecks/lazyload')
+var h1 = require('../lib/qcChecks/h1')
+var copy = require('../lib/qcChecks/copy')
+var ctas = require('../lib/qcChecks/cta')
+var altText = require('../lib/qcChecks/alt-text')
+const grammar = require('../lib/qcChecks/grammar')
 
 // Import the Quality Check Class
 var QualityCheck = require('../controllers/qualityControlClass')
@@ -24,7 +24,7 @@ g5QualityControl.addExternal('PageSpeed', pageSpeed.checks, ['Test', 'Score'])
 // Add Global Checks
 g5QualityControl.addGlobal('Strutured Data', structuredData.check, false)
 g5QualityControl.addGlobal('Publish Date', PublishDate.get, false)
-g5QualityControl.addGlobal('GA #', googleAnalytics.check, false)
+g5QualityControl.addGlobal('GA #', googleAnalytics.check, 'GA #')
 // // Add app page checks
 g5QualityControl.add('Copy', copy.check, ['Page', 'Word'])
 // g5QualityControl.add('LazyLoad', lazyLoad.check, ['Page', 'Image'])

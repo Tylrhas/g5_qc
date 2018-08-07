@@ -2,7 +2,6 @@ const puppeteer = require('puppeteer')
 const models = require('../models')
 var g5QualityControl = require('../config/qcChecks')
 
-
 async function crawl (io) {
   var crawled = []
   var urls = []
