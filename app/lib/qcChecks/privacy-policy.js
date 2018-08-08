@@ -8,17 +8,17 @@ async function noIndex (page, url, checkName) {
       // This is the privacy policy page look for no index twice to show it is enabled for staging
       if (privacyPolicyNoIndex <= 1) {
         // not set to no index
-        return {checkName: checkName, results: [url, false]}
+        return {checkName: checkName, results: [[url, false]]}
       } else {
         // Is set to no index
-        return {checkName: checkName, results: [url, true]}
+        return {checkName: checkName, results: [[url, true]]}
       }
     } else {
       // it only needs to show up once
       if (privacyPolicyNoIndex >= 1) {
-        return {checkName: checkName, results: [url, true]}
+        return {checkName: checkName, results: [[url, true]]}
       } else {
-        return {checkName: checkName, results: [url, false]}
+        return {checkName: checkName, results: [[url, false]]}
       }
     }
   } else {
