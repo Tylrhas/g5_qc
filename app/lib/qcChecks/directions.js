@@ -1,4 +1,4 @@
-async function checkDirections (page, url) {
+async function checkDirections (page, url, checkName) {
   let directions = await page.$$eval('.directions.widget', directionsWidgets => directionsWidgets.length)
 
   if (directions > 0) {
@@ -28,16 +28,18 @@ async function checkDirections (page, url) {
         // console.log(footerAddress)
         console.log(endingAddresses + ' : ' + footerAddress)
         if (endingAddresses === footerAddress) {
-          return [url, true]
+          return {checkName: checkName, results: [url, true]}
         } else {
-          return [url, false]
+          return {checkName: checkName, results: [url, false]}
         }
       } else {
-        return [url, false]
+        return {checkName: checkName, results: [url, false]}
       }
     } catch (error) {
-      return [url, error]
+      return {checkName: checkName, results: [url, error]}
     }
+  } else {
+    return {checkName: checkName, results: null}
   }
 }
 

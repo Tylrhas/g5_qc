@@ -1,5 +1,5 @@
 var spell = require('../spell.js')
-var dictionary = require('../custom-dictionary.js')
+var dictionary = require('../../controllers/custom-dictionary.js')
 
 async function check (page, url, checkName) {
   // Initilize the dictionary

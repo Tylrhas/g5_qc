@@ -108,7 +108,7 @@ class QualityCheck {
     var externalfunctions = []
     for (let i = 0; i < this.externalQualityChecks.length; i++) {
       var externalChecksName = this.externalQualityChecks[i][0]
-      externalfunctions.push(this.externalQualityChecks[i][1](pupeteerPage, url).then(results => {
+      externalfunctions.push(this.externalQualityChecks[i][1](pupeteerPage, url, externalChecksName).then(results => {
         return { externalChecksName, results }
       }))
     }
@@ -135,8 +135,10 @@ class QualityCheck {
       for (let checkIndex = 0; checkIndex < value.length; checkIndex++) {
         let check = value[checkIndex]
         let id = check.checkName.replace(' ', '_').toLowerCase()
-        for (let i = 0; i < check.results.length; i++) {
-          this.results.qcChecks[id].result.push(check.results[i])
+        if (check.results !== null) {
+          for (let i = 0; i < check.results.length; i++) {
+            this.results.qcChecks[id].result.push(check.results[i])
+          }
         }
       }
     }

@@ -1,4 +1,4 @@
-async function check (page, url) {
+async function check (page, url, checkName) {
   let results = []
   // get all images alt text except for the divider image
   let altText = await page.$$eval('img:not(.divider-image)', images => {
@@ -14,7 +14,7 @@ async function check (page, url) {
       results.push([url, altText[i][0], altText[i][1]])
     }
   }
-  return results
+  return {checkName, results}
 }
 
 module.exports.check = check

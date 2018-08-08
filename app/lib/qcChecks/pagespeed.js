@@ -7,6 +7,7 @@ async function checks (page, url, globalChecksName) {
   })
   console.log(scores)
   await page.goto(url)
+
   return {globalChecksName: globalChecksName, results: [['Mobile', scores[0]], ['Desktop', scores[1]]]}
 }
 

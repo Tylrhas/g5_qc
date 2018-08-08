@@ -1,20 +1,18 @@
-async function check (page, url) {
+async function check (page, url, checkName) {
   // get all images with lazyload enabled
   let lazyLoad = await page.$$eval('img.lazy-load', images => {
     return images.map((img) => img.getAttribute('data-src'))
   })
 
-  return format(lazyLoad, url)
+  return format(lazyLoad, url, checkName)
 }
 
-function format (array, page) {
-  console.log(array)
-  var result = []
+function format (array, page, checkName) {
+  var results = []
   for (let i = 0; i < array.length; i++) {
-    result.push([page, array[i]])
+    results.push([page, array[i]])
   }
-  console.log(result)
-  return result
+  return {checkName, results}
 }
 
 module.exports.check = check

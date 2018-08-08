@@ -27,12 +27,12 @@ g5QualityControl.addGlobal('Publish Date', PublishDate.get, false)
 g5QualityControl.addGlobal('GA #', googleAnalytics.check, 'GA #')
 // // Add app page checks
 g5QualityControl.add('Copy', copy.check, ['Page', 'Word'])
-// g5QualityControl.add('LazyLoad', lazyLoad.check, ['Page', 'Image'])
+g5QualityControl.add('LazyLoad', lazyLoad.check, ['Page', 'Image'])
 g5QualityControl.add('Grammar', grammar.check, ['Page', 'Copy', 'Error'])
-// g5QualityControl.add('CTAs', ctas.check, ['Page', 'Link', 'Text'])
-// g5QualityControl.add('Directions', directionsWidget.checkDirections, ['Page', 'Matched'])
-// g5QualityControl.add('Multiple H1s', h1.check, ['Page', 'H1'])
-// g5QualityControl.add('No Index', privacyPolicy.noIndex, ['Page', 'No-Index'])
-// g5QualityControl.add('Alt Text', altText.check, ['Page', 'No-Index'])
+g5QualityControl.add('CTAs', ctas.check, ['Page', 'Link', 'Text'])
+g5QualityControl.add('Directions', directionsWidget.checkDirections, ['Page', 'Matched'])
+g5QualityControl.add('Multiple H1s', h1.check, ['Page', 'H1'])
+g5QualityControl.add('No Index', privacyPolicy.noIndex, ['Page', 'No-Index'])
+g5QualityControl.add('Alt Text', altText.check, ['Page', 'No-Index'])
 
 module.exports = g5QualityControl

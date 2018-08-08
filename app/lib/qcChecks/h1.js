@@ -1,4 +1,4 @@
-async function check (page, url) {
+async function check (page, url, checkName) {
   var results = []
   // Check for Multiple H1s on a single page
   let h1s = await page.$$eval('h1', h1s => {
@@ -11,7 +11,7 @@ async function check (page, url) {
       h1s.push([url, h1s[i]])
     }
   }
-  return results
+  return {checkName, results}
 }
 
 module.exports.check = check

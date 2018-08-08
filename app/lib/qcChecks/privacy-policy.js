@@ -1,4 +1,4 @@
-async function noIndex (page, url) {
+async function noIndex (page, url, checkName) {
   // Check if the slug is privacy-policy
   var pageSlug = url.substring(url.lastIndexOf('/') + 1)
   if (pageSlug === 'privacy-policy') {
@@ -8,19 +8,21 @@ async function noIndex (page, url) {
       // This is the privacy policy page look for no index twice to show it is enabled for staging
       if (privacyPolicyNoIndex <= 1) {
         // not set to no index
-        return [url, false]
+        return {checkName: checkName, results: [url, false]}
       } else {
         // Is set to no index
-        return [url, true]
+        return {checkName: checkName, results: [url, true]}
       }
     } else {
       // it only needs to show up once
       if (privacyPolicyNoIndex >= 1) {
-        return [url, true]
+        return {checkName: checkName, results: [url, true]}
       } else {
-        return [url, false]
+        return {checkName: checkName, results: [url, false]}
       }
     }
+  } else {
+    return {checkName: checkName, results: null}
   }
 }
 
