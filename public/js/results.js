@@ -112,16 +112,16 @@ function validateStatus () {
     $('#v-pills-ga-tab .row span').removeClass('oi-check passed').addClass('oi-warning failed')
   }
 
-  $('#v-pills-noIndex table tr td:nth-child(2)').each(function (i) {
+  $('#v-pills-no_index table tr td:nth-child(2)').each(function (i) {
     console.log($(this).text())
     let text = $(this).text()
 
     if (text === 'false') {
-      directionsStatus = false
+      noIndexStatus = false
     }
   })
   if (noIndexStatus) {
-    $('#v-pills-noIndex-tab .row span').removeClass('oi-warning failed').addClass('oi-check passed')
+    $('#v-pills-no_index-tab .row span').removeClass('oi-warning failed').addClass('oi-check passed')
   }
 }
 

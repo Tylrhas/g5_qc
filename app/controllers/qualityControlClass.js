@@ -1,5 +1,5 @@
 class QualityCheck {
-  constructor() {
+  constructor () {
     this.qualityChecks = []
     this.globalQualityChecks = []
     this.externalQualityChecks = []

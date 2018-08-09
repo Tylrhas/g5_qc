@@ -28,15 +28,15 @@ async function checkDirections (page, url, checkName) {
         // console.log(footerAddress)
         console.log(endingAddresses + ' : ' + footerAddress)
         if (endingAddresses === footerAddress) {
-          return {checkName: checkName, results: [url, true]}
+          return {checkName: checkName, results: [[url, true]]}
         } else {
-          return {checkName: checkName, results: [url, false]}
+          return {checkName: checkName, results: [[url, false]]}
         }
       } else {
-        return {checkName: checkName, results: [url, false]}
+        return {checkName: checkName, results: [[url, false]]}
       }
     } catch (error) {
-      return {checkName: checkName, results: [url, error]}
+      return {checkName: checkName, results: [[url, error]]}
     }
   } else {
     return {checkName: checkName, results: null}

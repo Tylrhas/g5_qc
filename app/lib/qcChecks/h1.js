@@ -8,7 +8,7 @@ async function check (page, url, checkName) {
   if (h1s.length > 1) {
     // We have more than 1 h1 per page
     for (let i = 0; i < h1s.length; i++) {
-      h1s.push([url, h1s[i]])
+      results.push([url, h1s[i]])
     }
   }
   return {checkName, results}
