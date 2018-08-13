@@ -24,7 +24,7 @@ g5QualityControl.addExternal('PageSpeed', pageSpeed.checks, ['Test', 'Score'])
 // Add Global Checks
 g5QualityControl.addGlobal('Strutured Data', structuredData.check, false)
 g5QualityControl.addGlobal('Publish Date', PublishDate.get, false)
-g5QualityControl.addGlobal('GA #', googleAnalytics.check, 'GA #')
+g5QualityControl.addGlobal('GA', googleAnalytics.check, 'GA #')
 // // Add app page checks
 g5QualityControl.add('Copy', copy.check, ['Page', 'Word'])
 g5QualityControl.add('LazyLoad', lazyLoad.check, ['Page', 'Image'])

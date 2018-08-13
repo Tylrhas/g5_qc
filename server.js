@@ -125,6 +125,10 @@ models.sequelize.sync().then(function () {
   console.log(err, 'Something went wrong with the Database Update!')
 })
 function enqueue (url) {
+  // make sure the URL has a "/" as the last character
+  if (url[url.length - 1] === '/') {
+    url = url.replace(/\/$/, '')
+  }
   return models.jobQueue.create({ url })
 }
 

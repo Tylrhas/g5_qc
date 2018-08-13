@@ -65,6 +65,7 @@ async function getLinks (page, urls, url, crawled) {
   // remove duplicates, urls of a different domains and phone numbers
   let uniqueArray = []
   for (let i = 0; i < allAnchors.length; i++) {
+    console.log(allAnchors[i])
     if (uniqueArray.indexOf(allAnchors[i]) === -1 && allAnchors[i].includes(g5QualityControl.homepage) === true && crawled.indexOf(allAnchors[i].replace(/\/$/, '')) === -1 && allAnchors[i].includes('#') === false) {
       // push the URL without the trailing /
       uniqueArray.push(allAnchors[i].replace(/\/$/, ''))

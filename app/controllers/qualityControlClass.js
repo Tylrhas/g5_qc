@@ -109,7 +109,7 @@ class QualityCheck {
     for (let i = 0; i < this.externalQualityChecks.length; i++) {
       var externalChecksName = this.externalQualityChecks[i][0]
       externalfunctions.push(this.externalQualityChecks[i][1](pupeteerPage, url, externalChecksName).then(results => {
-        return { externalChecksName, results }
+        return results
       }))
     }
     return Promise.all(externalfunctions)

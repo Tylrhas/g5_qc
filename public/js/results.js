@@ -1,7 +1,9 @@
 import * as globalChecks from './globalChecks.js'
+import * as externalChecks from './externalChecks.js'
 
 export function render (data) {
   globalChecks.render(data.global)
+  externalChecks.render(data.external)
   addQCChecks(data)
 }
 
@@ -126,7 +128,7 @@ function validateStatus () {
 }
 
 function addCopyButton () {
-  $('#v-pills-lazyLoad table tr td:nth-child(2)').each(function (i) {
+  $('#v-pills-lazyload table tr td:nth-child(2)').each(function (i) {
     let imageURL = $(this).text()
     let input = '<input class="lazyLoadInput" id="image-' + i + '" value="' + imageURL + '">'
     let button = '<button class="btn btn-primary btn-block g5-button-small" data-clipboard-target="#image-' + i + '">Copy Image URL</button>'

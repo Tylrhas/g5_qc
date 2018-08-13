@@ -1,4 +1,4 @@
-async function checks (page, url, globalChecksName) {
+async function checks (page, url, externalChecksName) {
 // load the page
   let pageSpeedURL = process.env.PAGE_SPEED_URL + url + '&tab=desktop'
   await page.goto(pageSpeedURL)
@@ -7,8 +7,7 @@ async function checks (page, url, globalChecksName) {
   })
   console.log(scores)
   await page.goto(url)
-
-  return {globalChecksName: globalChecksName, results: [['Mobile', scores[0]], ['Desktop', scores[1]]]}
+  return {externalChecksName, results: [['Mobile', scores[0]], ['Desktop', scores[1]]]}
 }
 
 module.exports.checks = checks
