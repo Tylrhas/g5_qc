@@ -151,21 +151,3 @@ function addCopyButton () {
     console.error('Trigger:', e.trigger)
   })
 }
-function addClickEvents () {
-  $('.add-word').click(function () {
-    let target = this
-    var word = {}
-    word.add = $(this).attr('word')
-    $(this).html('Adding')
-    $.ajax({
-      type: 'POST',
-      url: '/dictionary/add',
-      data: word,
-      success: function (data) {
-        $(target).addClass('disabled')
-        $(target).html('Added')
-      },
-      dataType: 'JSON'
-    })
-  })
-}
