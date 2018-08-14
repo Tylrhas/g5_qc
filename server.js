@@ -92,21 +92,18 @@ io.on('connection', function (socket) {
       })
       jobQueue.then(function (jobQueue) {
         if (!jobQueue) {
-          console.log('here we go!')
           crawl.crawl(io)
         }
       })
     })
   })
   socket.on('createWord', function (data) {
-    // Create on for create word
     dictionary.add(data.word).then(() => {
       io.emit('wordAdded', data.word)
     })
   })
 
   socket.on('removeWord', function (data) {
-    // Create on for remove word
     dictionary.remove(data.word).then(() => {
       io.emit('wordRemoved', data.word)
     })
@@ -114,6 +111,13 @@ io.on('connection', function (socket) {
 
   socket.on('removeJob', function (data) {
     // Create on for Remove Job
+    models.jobQueue.destroy({
+      where: {
+        id: data.job
+      }
+    }).then(results => {
+      io.emit('jobRemoved', data.job)
+    })
   })
 })
 

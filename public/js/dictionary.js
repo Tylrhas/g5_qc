@@ -18,5 +18,6 @@ socket.on('wordRemoved', function (data) {
 })
 
 socket.on('wordAdded', function (data) {
-  
+  let row = '<tr id="' + data + '"><td><h4>' + data + '</h4><button word="' + data + '" class="btn btn-danger remove-word">Remove Word</button></td></tr>'
+  $('#customDictWords').append(row)
 })
