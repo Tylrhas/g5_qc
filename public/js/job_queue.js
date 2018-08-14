@@ -3,7 +3,7 @@ socket.on('newJob', function (data) {
   addJob(data)
 })
 socket.on('qcDone', function (data) {
-  removeJob(data)
+  removeJob(data.jobId)
 })
 socket.on('jobStart', function (data) {
   Updatejob(data)
