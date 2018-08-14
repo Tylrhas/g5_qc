@@ -74,7 +74,7 @@ app.get('/', checkAuthentication, function (req, res) {
   let words = dictionary.load()
   // Successful authentication, render home.
   Promise.all([jobs, words]).then(results => {
-    res.render('pages/index', { user: req.user, jobs: results[0], dictionary: results[0] })
+    res.render('pages/index', { user: req.user, jobs: results[0], dictionary: results[1] })
   })
 })
 

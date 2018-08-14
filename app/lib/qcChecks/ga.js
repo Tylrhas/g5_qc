@@ -7,7 +7,7 @@ async function check (page, url, globalChecksName) {
     // GA is set up
     return {globalChecksName, results}
   } else {
-    return {globalChecksName: globalChecksName, results: null}
+    return {globalChecksName: globalChecksName, results: false}
   }
 }
 module.exports.check = check

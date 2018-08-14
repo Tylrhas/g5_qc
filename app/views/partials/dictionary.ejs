@@ -1,0 +1,14 @@
+<div class="container">
+    <h2 class="page-title">Custom Dictionary</h2>
+    <table class="table table-bordered table-striped" id="customDictWords">
+        <tbody>
+            <% for(var i=0; i < dictionary.length; i++) {%>
+            <tr id="<%= dictionary[i] %>">
+              <td><h4><%= dictionary[i] %></h4>
+                <button word="<%= dictionary[i] %>" class="btn btn-danger remove-word">Remove Word</button>
+              </td>
+            </tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>

@@ -33,7 +33,7 @@ function addButton (globalCheck) {
     let publishDate = globalCheck.result
     $('#results>.container>.row.center').after(' <div class="row"><h4 class="center col">' + globalCheck.name + ' : ' + publishDate + '</h4></div>')
   } else if (globalCheck.name === 'GA') {
-    if (globalCheck.result.length > 1) {
+    if (globalCheck.result[1] !== false) {
       span = '<span class="oi oi-check passed"></span>'
       // Create the tab content
       // Create a new Row
