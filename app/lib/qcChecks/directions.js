@@ -20,7 +20,7 @@ async function checkDirections (page, url, checkName) {
         var footerAddress = await page.$$eval('.adr', footerAddresses => {
           return footerAddresses.map((footerAddress) => footerAddress.innerText)
         })
-        footerAddress = footerAddress[0].replace(/\r?\n|\r/g, '').trim()
+        footerAddress = footerAddress[0].replace(/\r?\n|\r/g, ', ').trim()
         endingAddresses = endingAddresses[1]
         endingAddresses = endingAddresses.substr(0, endingAddresses.lastIndexOf(','))
         console.log(endingAddresses)
