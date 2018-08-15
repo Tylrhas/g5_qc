@@ -64,7 +64,6 @@ function addQCChecks (data) {
   }
   validateStatus()
   addCopyButton()
-  addClickEvents()
 }
 
 function validateStatus () {

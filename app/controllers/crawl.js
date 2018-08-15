@@ -7,8 +7,8 @@ async function crawl (io) {
   var urls = []
   var job = await getNext()
   var url = job[0].url
-  // define the homepage URL
-  g5QualityControl.homepage = url
+  // define the homepage URL without the http or https prefix
+  g5QualityControl.homepage = url.replace(/^https?:\/\//, '')
   // initialize the QC checks
   g5QualityControl.init()
   await job[0].update({ processing: true })
@@ -84,6 +84,10 @@ function nextPage (crawled, urls, page, browser, io, job) {
     page.goto(newPage).then(naviation => {
       return qcPage(page, newPage, crawled, browser, urls, io, job)
     })
+      .catch(error => {
+        // there was an error loading the page
+        g5QualityControl.error = error
+      })
   } else {
     browser.close()
     // add job id to the results
