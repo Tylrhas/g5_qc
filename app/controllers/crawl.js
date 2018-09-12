@@ -14,10 +14,13 @@ async function crawl (io) {
   await job[0].update({ processing: true })
 
   var args
-  if (process.env.ENVIRONMENT === 'dev') {
-    args = { headless: false }
-  } else {
+  if (process.env.ENVIRONMENT === 'prod') {
     args = { args: ['--no-sandbox', '--disable-setuid-sandbox'] }
+  } else {
+    // args = {
+    //   headless: false
+    // }
+    args = {}
   }
   // initilize the browser
   puppeteer.launch(args).then(browser => {
