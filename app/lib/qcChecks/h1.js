@@ -10,6 +10,8 @@ async function check (page, url, checkName) {
     for (let i = 0; i < h1s.length; i++) {
       results.push([url, h1s[i]])
     }
+  } else if (h1s.length < 1) {
+    results.push([url, 'No H1s'])
   }
   return {checkName, results}
 }

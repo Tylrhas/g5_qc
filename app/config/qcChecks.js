@@ -12,6 +12,8 @@ var copy = require('../lib/qcChecks/copy')
 var ctas = require('../lib/qcChecks/cta')
 var altText = require('../lib/qcChecks/alt-text')
 const grammar = require('../lib/qcChecks/grammar')
+var meta = require('../lib/qcChecks/meta')
+var linksPerWords = require('../lib/qcChecks/link-check')
 
 // Import the Quality Check Class
 var QualityCheck = require('../controllers/qualityControlClass')
@@ -34,5 +36,7 @@ g5QualityControl.add('Directions', directionsWidget.checkDirections, ['Page', 'M
 g5QualityControl.add('Multiple H1s', h1.check, ['Page', 'H1'])
 g5QualityControl.add('No Index', privacyPolicy.noIndex, ['Page', 'No-Index'])
 g5QualityControl.add('Alt Text', altText.check, ['Page', 'Image URL'])
+g5QualityControl.add('Meta', meta.notBlank, ['Page', 'Error'])
+g5QualityControl.add('Links', linksPerWords.check, ['Page', 'Error'])
 
 module.exports = g5QualityControl
