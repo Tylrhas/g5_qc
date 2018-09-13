@@ -14,6 +14,7 @@ var altText = require('../lib/qcChecks/alt-text')
 const grammar = require('../lib/qcChecks/grammar')
 var meta = require('../lib/qcChecks/meta')
 var linksPerWords = require('../lib/qcChecks/link-check')
+var lsep = require('../lib/qcChecks/lsep')
 
 // Import the Quality Check Class
 var QualityCheck = require('../controllers/qualityControlClass')
@@ -38,5 +39,6 @@ g5QualityControl.add('No Index', privacyPolicy.noIndex, ['Page', 'No-Index'])
 g5QualityControl.add('Alt Text', altText.check, ['Page', 'Image URL'])
 g5QualityControl.add('Meta', meta.notBlank, ['Page', 'Error'])
 g5QualityControl.add('Links', linksPerWords.check, ['Page', 'Error'])
+g5QualityControl.add('LSEP', lsep.check, ['Page', 'Error'])
 
 module.exports = g5QualityControl
